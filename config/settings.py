@@ -24,7 +24,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'django_filters',
-    # Local apps (keyinroq qo'shamiz)
+    # Local apps
+    'users',
+    'books',
+    'orders',
+    'reviews',
 ]
 
 MIDDLEWARE = [
