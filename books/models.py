@@ -16,8 +16,8 @@ class Author(models.Model):
         return self.full_name
 
 class Book(models.Model):
-    cover_image = models.ImageField(upload_to='books/covers/')
-    book_file = models.FileField(upload_to='books/files/')
+    cover_image = models.ImageField(upload_to='books/covers/', null=True, blank=True)
+    book_file = models.FileField(upload_to='books/files/', null=True, blank=True)
     title = models.CharField(max_length=155)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
