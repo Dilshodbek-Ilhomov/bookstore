@@ -23,6 +23,7 @@ class OrderItem(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='order_items')
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return f'{self.book.title} x {self.quantity}'
