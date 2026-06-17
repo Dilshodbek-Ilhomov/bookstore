@@ -35,6 +35,10 @@ urlpatterns = [
         include('users.urls')
     ),
     path(
+        'api/',
+         include('books.urls')
+    ),
+    path(
         'api/auth/login/',
         TokenObtainPairView.as_view(),
         name='token_obtain_pair'
@@ -51,7 +55,7 @@ urlpatterns = [
     ),
 
     path(
-        'api/',
+        'api/docs/',
         SpectacularSwaggerView.as_view(
         url_name='schema'
     ),
