@@ -34,10 +34,18 @@ urlpatterns = [
         'api/auth/',
         include('users.urls')
     ),
+
+
     path(
         'api/',
          include('books.urls')
     ),
+
+    path(
+        'api/',
+         include('orders.urls')
+    ),
+
     path(
         'api/auth/login/',
         TokenObtainPairView.as_view(),
