@@ -21,3 +21,7 @@ class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = BookSerializer
+
+    filterset_fields = ["category"]
+    search_fields = ["title", "description", "authors__full_name",]
+    ordering_fields = ["price", "created_at", "stock"]
