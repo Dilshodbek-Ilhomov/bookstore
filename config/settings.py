@@ -132,6 +132,8 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'BookStore API',
     'DESCRIPTION': 'O\'zbek kitob bozori uchun backend API',
     'VERSION': '1.0.0',
+
+    'COMPONENT_SPLIT_REQUEST': True,
 }
 
 # JWT
