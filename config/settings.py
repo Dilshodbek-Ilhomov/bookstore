@@ -10,7 +10,17 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["book-store.uz", "www.book-store.uz", "127.0.0.1", "localhost",]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://book-store.uz",
+    "https://www.book-store.uz",
+]
+
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https",
+)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
