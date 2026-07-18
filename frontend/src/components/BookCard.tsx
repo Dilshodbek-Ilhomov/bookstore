@@ -1,0 +1,86 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "motion/react";
+import { ShoppingCart, Star } from "@phosphor-icons/react";
+import type { Book } from "@/types";
+import { formatPrice, getImageUrl } from "@/lib/utils";
+import { getLocalizedBookTitle, getLocalizedBookDesc } from "@/lib/i18n";
+import { useCartStore } from "@/store/cartStore";
+import { useLanguageStore } from "@/store/languageStore";
+
+interface BookCardProps {
+  book: Book;
+}
+
+export function BookCard({ book }: BookCardProps) {
+  const addItem = useCartStore((s) => s.addItem);
+  const openCart = useCartStore((s) => s.openCart);
+  const { language, t } = useLanguageStore();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(book);
+    openCart();
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="group relative flex flex-col rounded-3xl border border-white/10 bg-navy-900/75 p-4 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-gold-400/40 hover:bg-navy-900 hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.12)] hover:-translate-y-1.5 overflow-hidden"
+    >
+      {/* Micro-Sheen Reflection */}
+      <span className="sheen-overlay" aria-hidden="true" />
+
+      {/* Image Container with clean framing */}
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-navy-950 mb-4 ring-1 ring-white/5 transition-all duration-500 group-hover:ring-gold-400/20">
+        <Image
+          src={getImageUrl(book.cover_image)}
+          alt={getLocalizedBookTitle(book, language, t)}
+          fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+          priority={false}
+        />
+        
+        {/* Hover action overlay */}
+        <div className="absolute inset-0 bg-navy-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+          <button
+            onClick={handleAddToCart}
+            className="group/btn relative h-12 w-12 overflow-hidden rounded-full bg-gradient-to-tr from-gold-400 to-gold-500 text-navy-950 flex items-center justify-center shadow-[0_10px_24px_-6px_rgba(201,168,76,0.6)] hover:scale-110 active:scale-95 transition-transform duration-300"
+            aria-label={t.bookCard.add}
+          >
+            <span className="sheen-overlay" aria-hidden="true" />
+            <ShoppingCart weight="bold" className="relative z-10 w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Book details */}
+      <Link href={`/books/${book.id}`} className="flex-1 flex flex-col z-10">
+        <h3 className="text-base font-bold tracking-tight text-text-primary group-hover:text-gold-300 transition-colors duration-200 line-clamp-1 mb-1">
+          {getLocalizedBookTitle(book, language, t)}
+        </h3>
+        <p className="text-xs text-text-secondary mb-3 line-clamp-1">
+          {getLocalizedBookDesc(book, language, t)}
+        </p>
+        
+        {/* Rating and Price */}
+        <div className="mt-auto flex items-center justify-between pt-3 border-t border-white/5">
+          <span className="text-base font-bold font-mono tracking-tight text-gold-400">
+            {formatPrice(book.price, language)}
+          </span>
+          <div className="flex items-center gap-1 rounded-full bg-white/[0.04] border border-white/5 px-2.5 py-1 text-gold-400">
+            <Star weight="fill" className="w-3.5 h-3.5" />
+            <span className="text-xs font-semibold font-mono text-text-primary">4.9</span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
