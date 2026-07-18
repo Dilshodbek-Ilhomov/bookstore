@@ -33,5 +33,7 @@ class ReviewCreateSerializer(serializers.Serializer):
                 comment = validated_data["comment"]
             )
 
-
             return review
+
+    def to_representation(self, instance):
+        return ReviewSerializer(instance).data

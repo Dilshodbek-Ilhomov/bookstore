@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from books.models import Book
+from books.serializers import BookSerializer
 from .models import OrderItem, Order
 from django.db import transaction
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
     class Meta:
         model = OrderItem
         fields = ['id', 'book', 'quantity', 'price', 'total_price']
