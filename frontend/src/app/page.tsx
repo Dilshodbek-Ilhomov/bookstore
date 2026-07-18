@@ -1,0 +1,200 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { HeroSection } from "@/components/HeroSection";
+import { BookCard } from "@/components/BookCard";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import { booksAPI, categoriesAPI } from "@/lib/api";
+import type { Book, Category } from "@/types";
+import { ArrowRight, BookOpen, Fire, Trophy, Truck, Star } from "@phosphor-icons/react";
+import Link from "next/link";
+import { useLanguageStore } from "@/store/languageStore";
+import { getLocalizedCategoryName } from "@/lib/i18n";
+
+const MOCK_CATEGORIES: Category[] = [
+  { id: 1, name: "Badiiy adabiyot" },
+  { id: 2, name: "Shaxsiy rivojlanish" },
+  { id: 3, name: "Bolalar adabiyoti" },
+  { id: 4, name: "Ilmiy-ommabop" },
+];
+
+export default function Home() {
+  const [books, setBooks] = useState<Book[]>([]);
+  const [categories, setCategories] = useState<Category[]>(MOCK_CATEGORIES);
+  const [loading, setLoading] = useState(true);
+  const { language, t } = useLanguageStore();
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [booksRes, catsRes] = await Promise.all([
+          booksAPI.list({ page: 1 }),
+          categoriesAPI.list(),
+        ]);
+        if (booksRes?.results?.length > 0) {
+          setBooks(booksRes.results.slice(0, 4));
+        } else {
+          setBooks([]);
+        }
+        if (catsRes?.results?.length > 0) {
+          setCategories(catsRes.results);
+        }
+      } catch (err) {
+        console.error("API Error when loading books:", err);
+        setBooks([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  // Map mock category IDs to localized descriptions and titles if available
+  const getCategoryDetails = (cat: Category, index: number) => {
+    if (index === 0) return { title: t.categories.badiiy, desc: t.categories.badiiyDesc };
+    if (index === 1) return { title: t.categories.shaxsiy, desc: t.categories.shaxsiyDesc };
+    if (index === 2) return { title: t.categories.bolalar, desc: t.categories.bolalarDesc };
+    return { title: getLocalizedCategoryName(cat, language, t), desc: t.categories.subtitle };
+  };
+
+  return (
+    <div className="relative pb-24">
+      <HeroSection books={books} loading={loading} />
+
+      {/* Featured / Mashhur kitoblar */}
+      <section id="featured" className="section-spacing relative z-10">
+        <div className="section-container">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-gold-400/20 bg-gold-400/[0.06] px-3 py-1 text-xs text-gold-300 font-medium mb-3">
+                <Fire weight="fill" className="w-3.5 h-3.5 text-gold-400" /> {t.featured.badge}
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text-primary flex items-center gap-3.5">
+                <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 shadow-[0_0_25px_rgba(201,168,76,0.35)] border border-gold-300/30 shrink-0 transform -rotate-3 transition-transform duration-500 hover:rotate-0 hover:scale-110">
+                  <BookOpen weight="fill" className="w-6 h-6 text-navy-950" />
+                </span>
+                <span>{t.featured.title}</span>
+              </h2>
+            </div>
+            <Link
+              href="/books"
+              className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-medium text-text-primary transition-all hover:border-gold-400/40 hover:bg-white/[0.06] mt-4 md:mt-0 active:scale-[0.98]"
+            >
+              <span>{t.featured.allBooks}</span>
+              <ArrowRight className="w-4 h-4 text-gold-400 transition-transform duration-200 group-hover:translate-x-1" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {books.map((book) => (
+              <BookCard key={book.id} book={book} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bento categories grid (TasteSkill Asymmetric Layout) */}
+      <section className="section-spacing relative z-10">
+        <div className="section-container">
+          <div className="max-w-2xl mb-14">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text-primary mb-4">
+              {t.categories.title}
+            </h2>
+            <p className="text-text-secondary text-base leading-relaxed">
+              {t.categories.subtitle}
+            </p>
+          </div>
+
+          {/* Asymmetric Bento layout */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {categories.slice(0, 3).map((category, index) => {
+              const bentoClasses = [
+                "md:col-span-2 bg-gradient-to-br from-gold-400/[0.08] via-navy-900/90 to-navy-950",
+                "md:col-span-1 bg-gradient-to-br from-navy-900/90 to-navy-950",
+                "md:col-span-3 bg-gradient-to-r from-navy-900/90 via-gold-400/[0.06] to-navy-950",
+              ];
+              const details = getCategoryDetails(category, index);
+              return (
+                <ScrollReveal key={category.id} delay={index * 0.1}>
+                  <Link
+                    href={`/books?category=${category.id}`}
+                    className={`group relative flex flex-col justify-between h-64 sm:h-72 p-8 sm:p-10 rounded-3xl border border-white/10 ${bentoClasses[index % bentoClasses.length]} shadow-[0_20px_40px_-16px_rgba(0,0,0,0.65)] backdrop-blur-xl transition-all duration-500 hover:border-gold-400/40 hover:-translate-y-1 hover:shadow-[0_28px_56px_-16px_rgba(0,0,0,0.8)] overflow-hidden`}
+                  >
+                    <span className="sheen-overlay" aria-hidden="true" />
+                    
+                    <div className="flex items-start justify-between">
+                      <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:border-gold-400/40">
+                        <BookOpen weight="thin" className="w-7 h-7 text-gold-400" />
+                      </div>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.04] border border-white/5 px-3 py-1 text-xs font-mono text-text-muted group-hover:text-gold-300 transition-colors">
+                        {t.categories.explore} →
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-text-primary group-hover:text-gold-300 transition-colors mb-2">
+                        {details.title}
+                      </h3>
+                      <p className="text-sm text-text-secondary max-w-md">
+                        {details.desc}
+                      </p>
+                    </div>
+                  </Link>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Steps section — Tactile cards layout */}
+      <section className="section-spacing relative z-10 border-t border-white/5 bg-navy-900/20">
+        <div className="section-container">
+          <div className="max-w-2xl mb-14">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text-primary mb-4">
+              {t.steps.title}
+            </h2>
+            <p className="text-text-secondary text-base leading-relaxed">
+              {t.steps.subtitle}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            <div className="group relative flex flex-col p-8 sm:p-10 rounded-3xl border border-white/10 bg-navy-900/60 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all duration-300 hover:border-gold-400/35 hover:-translate-y-1 h-full overflow-hidden">
+              <span className="sheen-overlay" aria-hidden="true" />
+              <div className="w-14 h-14 rounded-2xl bg-gold-400/10 border border-gold-400/20 flex items-center justify-center mb-6 font-mono font-bold text-xl text-gold-400">
+                01
+              </div>
+              <h3 className="text-lg font-bold text-text-primary mb-3">{t.steps.step1Title}</h3>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {t.steps.step1Desc}
+              </p>
+            </div>
+
+            <div className="group relative flex flex-col p-8 sm:p-10 rounded-3xl border border-white/10 bg-navy-900/60 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all duration-300 hover:border-gold-400/35 hover:-translate-y-1 h-full overflow-hidden">
+              <span className="sheen-overlay" aria-hidden="true" />
+              <div className="w-14 h-14 rounded-2xl bg-gold-400/10 border border-gold-400/20 flex items-center justify-center mb-6 font-mono font-bold text-xl text-gold-400">
+                02
+              </div>
+              <h3 className="text-lg font-bold text-text-primary mb-3">{t.steps.step2Title}</h3>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {t.steps.step2Desc}
+              </p>
+            </div>
+
+            <div className="group relative flex flex-col p-8 sm:p-10 rounded-3xl border border-white/10 bg-navy-900/60 shadow-[0_16px_32px_-12px_rgba(0,0,0,0.6)] backdrop-blur-md transition-all duration-300 hover:border-gold-400/35 hover:-translate-y-1 h-full overflow-hidden">
+              <span className="sheen-overlay" aria-hidden="true" />
+              <div className="w-14 h-14 rounded-2xl bg-gold-400/10 border border-gold-400/20 flex items-center justify-center mb-6 font-mono font-bold text-xl text-gold-400">
+                03
+              </div>
+              <h3 className="text-lg font-bold text-text-primary mb-3">{t.steps.step3Title}</h3>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {t.steps.step3Desc}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
