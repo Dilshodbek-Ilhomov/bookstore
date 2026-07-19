@@ -28,21 +28,34 @@ function BooksContent() {
   const currentOrdering = searchParams.get("ordering") || "";
   const currentView = searchParams.get("view");
 
+  const [activeCategory, setActiveCategory] = useState<string | null>(currentCategory);
+  const [activeSearch, setActiveSearch] = useState<string>(currentSearch);
+  const [activeOrdering, setActiveOrdering] = useState<string>(currentOrdering);
+  const [activeView, setActiveView] = useState<string | null>(currentView);
+
   const [books, setBooks] = useState<Book[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchVal, setSearchVal] = useState(currentSearch);
 
+  // Sync state if URL searchParams change externally
+  useEffect(() => {
+    setActiveCategory(searchParams.get("category"));
+    setActiveSearch(searchParams.get("search") || "");
+    setActiveOrdering(searchParams.get("ordering") || "");
+    setActiveView(searchParams.get("view"));
+  }, [searchParams]);
+
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       try {
-        const catId = currentCategory ? parseInt(currentCategory) : undefined;
+        const catId = activeCategory ? parseInt(activeCategory) : undefined;
         const [booksRes, catsRes] = await Promise.all([
           booksAPI.list({
             category: catId,
-            search: currentSearch || undefined,
-            ordering: currentOrdering || undefined,
+            search: activeSearch || undefined,
+            ordering: activeOrdering || undefined,
           }),
           categoriesAPI.list(),
         ]);
@@ -68,16 +81,21 @@ function BooksContent() {
       }
     }
     loadData();
-  }, [currentCategory, currentSearch, currentOrdering]);
+  }, [activeCategory, activeSearch, activeOrdering]);
 
   const updateFilters = (key: string, value: string | null) => {
+    if (key === "category") setActiveCategory(value);
+    if (key === "ordering") setActiveOrdering(value || "");
+    if (key === "search") setActiveSearch(value || "");
+    if (key === "view") setActiveView(value);
+
     const params = new URLSearchParams(searchParams.toString());
     if (value) {
       params.set(key, value);
     } else {
       params.delete(key);
     }
-    router.push(`/books?${params.toString()}`);
+    router.push(`/books?${params.toString()}`, { scroll: false });
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -85,20 +103,46 @@ function BooksContent() {
     updateFilters("search", searchVal);
   };
 
+  // Instant frontend sorting and filtering (backendga tegma - frontendda to'girlandi)
+  const displayedBooks = books
+    .filter((book) => {
+      if (!activeCategory) return true;
+      const catId = parseInt(activeCategory);
+      if (isNaN(catId)) return true;
+      return book.category === catId || book.category_detail?.id === catId;
+    })
+    .filter((book) => {
+      if (!activeSearch) return true;
+      const q = activeSearch.toLowerCase().trim();
+      const titleMatch = (book.title || "").toLowerCase().includes(q);
+      const descMatch = (book.description || "").toLowerCase().includes(q);
+      const authorMatch = book.authors_detail?.some((a) => a.full_name.toLowerCase().includes(q));
+      return titleMatch || descMatch || authorMatch;
+    })
+    .sort((a, b) => {
+      if (activeOrdering === "price") {
+        return Number(a.price) - Number(b.price);
+      }
+      if (activeOrdering === "-price") {
+        return Number(b.price) - Number(a.price);
+      }
+      return 0; // standard order
+    });
+
   return (
     <div className="section-container pt-32 pb-20">
       {/* Title */}
       <div className="mb-10 text-center md:text-left">
         <h1 className="text-3xl font-bold tracking-tight mb-2">
-          {currentView === "categories" ? t.categories.title : t.booksPage.title}
+          {activeView === "categories" ? t.categories.title : t.booksPage.title}
         </h1>
         <p className="text-text-secondary text-sm">
-          {currentView === "categories" ? t.categories.subtitle : t.booksPage.subtitle}
+          {activeView === "categories" ? t.categories.subtitle : t.booksPage.subtitle}
         </p>
       </div>
 
       {/* Category exploration view when clicked from navbar/footer */}
-      {currentView === "categories" && (
+      {activeView === "categories" && (
         <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {categories.map((cat) => (
             <button
@@ -108,7 +152,7 @@ function BooksContent() {
                 updateFilters("view", null);
               }}
               className={`p-5 rounded-2xl border text-left transition-all ${
-                currentCategory === String(cat.id)
+                activeCategory === String(cat.id)
                   ? "bg-gold-400/15 border-gold-400 text-gold-400 shadow-[0_0_20px_rgba(201,168,76,0.2)]"
                   : "glass hover:border-gold-400/40 text-text-primary"
               }`}
@@ -154,8 +198,8 @@ function BooksContent() {
               <button
                 onClick={() => updateFilters("category", null)}
                 className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  !currentCategory
-                    ? "bg-gold-400/10 text-gold-400"
+                  !activeCategory
+                    ? "bg-gold-400/10 text-gold-400 font-semibold"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/[0.02]"
                 }`}
               >
@@ -166,7 +210,7 @@ function BooksContent() {
                   key={cat.id}
                   onClick={() => updateFilters("category", String(cat.id))}
                   className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-between ${
-                    currentCategory === String(cat.id)
+                    activeCategory === String(cat.id)
                       ? "bg-gold-400/10 text-gold-400 font-semibold"
                       : "text-text-secondary hover:text-text-primary hover:bg-white/[0.02]"
                   }`}
@@ -190,8 +234,8 @@ function BooksContent() {
               <button
                 onClick={() => updateFilters("ordering", null)}
                 className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  !currentOrdering
-                    ? "bg-gold-400/10 text-gold-400"
+                  !activeOrdering
+                    ? "bg-gold-400/10 text-gold-400 font-semibold"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/[0.02]"
                 }`}
               >
@@ -200,8 +244,8 @@ function BooksContent() {
               <button
                 onClick={() => updateFilters("ordering", "price")}
                 className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  currentOrdering === "price"
-                    ? "bg-gold-400/10 text-gold-400"
+                  activeOrdering === "price"
+                    ? "bg-gold-400/10 text-gold-400 font-semibold"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/[0.02]"
                 }`}
               >
@@ -210,8 +254,8 @@ function BooksContent() {
               <button
                 onClick={() => updateFilters("ordering", "-price")}
                 className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  currentOrdering === "-price"
-                    ? "bg-gold-400/10 text-gold-400"
+                  activeOrdering === "-price"
+                    ? "bg-gold-400/10 text-gold-400 font-semibold"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/[0.02]"
                 }`}
               >
@@ -229,13 +273,13 @@ function BooksContent() {
                 <div key={i} className="aspect-[3/4] rounded-2xl glass animate-pulse" />
               ))}
             </div>
-          ) : books.length === 0 ? (
+          ) : displayedBooks.length === 0 ? (
             <div className="h-64 flex flex-col items-center justify-center text-center text-text-secondary">
               <p className="text-sm">{t.booksPage.emptyTitle}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {books.map((book) => (
+              {displayedBooks.map((book) => (
                 <BookCard key={book.id} book={book} />
               ))}
             </div>
