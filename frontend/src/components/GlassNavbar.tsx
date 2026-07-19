@@ -40,7 +40,7 @@ export function GlassNavbar() {
   return (
     <>
       <motion.header
-        className="fixed top-3 left-0 right-0 z-50 px-3 sm:top-4 sm:px-6 lg:top-5 lg:px-8 pointer-events-none transition-all duration-500"
+        className="fixed top-3 left-0 right-0 z-50 px-4 sm:top-4 sm:px-6 lg:top-5 lg:px-8 pointer-events-none transition-all duration-500"
         initial={false}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -77,7 +77,7 @@ export function GlassNavbar() {
           {/* Right Actions Pill */}
           <div className="pointer-events-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-navy-900/85 px-2 py-1.5 shadow-[0_10px_26px_-10px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md">
             {/* Language Switcher Segmented Control */}
-            <div className="inline-flex h-8 items-center rounded-full bg-white/[0.04] p-0.5 ring-1 ring-white/10">
+            <div className="hidden md:inline-flex h-8 items-center rounded-full bg-white/[0.04] p-0.5 ring-1 ring-white/10">
               <button
                 type="button"
                 onClick={() => setLanguage("uz")}

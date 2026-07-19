@@ -16,12 +16,14 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function formatPrice(price: string | number, lang: "uz" | "en" = "uz"): string {
   const num = typeof price === "string" ? parseFloat(price) : price;
-  const formatted = new Intl.NumberFormat(lang === "uz" ? "uz-UZ" : "en-US", {
-    style: "decimal",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(num);
-  return lang === "uz" ? `${formatted} so'm` : `${formatted} UZS`;
+  // Convert from UZS (database format) to USD ($) using a fixed rate of 12500 UZS = 1 USD
+  const usdPrice = num / 12500;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(usdPrice);
 }
 
 /**
