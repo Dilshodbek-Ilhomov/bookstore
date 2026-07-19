@@ -11,10 +11,11 @@ import { getLocalizedCategoryName } from "@/lib/i18n";
 
 // Mock Fallback Books in case API results are empty
 const FALLBACK_CATEGORIES: Category[] = [
-  { id: 1, name: "Badiiy adabiyot" },
-  { id: 2, name: "Shaxsiy rivojlanish" },
-  { id: 3, name: "Bolalar adabiyoti" },
-  { id: 4, name: "Ilmiy-ommabop" },
+  { id: 1, name: "Programming", book_count: 5 },
+  { id: 2, name: "Science", book_count: 4 },
+  { id: 3, name: "Business", book_count: 3 },
+  { id: 4, name: "History", book_count: 4 },
+  { id: 5, name: "Psychology", book_count: 6 },
 ];
 
 function BooksContent() {

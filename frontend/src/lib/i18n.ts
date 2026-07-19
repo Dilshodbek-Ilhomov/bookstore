@@ -118,6 +118,16 @@ export const translations = {
       stockAvailable: "Omborda mavjud",
       stockOut: "Omborda qolmagan",
       noDesc: "Tavsif mavjud emas.",
+      reviewsTitle: "Kitobxonlar fikrlari va baholari",
+      addReview: "Izoh va baho qoldirish",
+      ratingLabel: "Bahoyingiz (1 dan 5 gacha)",
+      commentLabel: "Sizning fikringiz",
+      submitReview: "Izoh yuborish",
+      submitting: "Yuborilmoqda...",
+      noReviews: "Hozircha ushbu kitobga izohlar yo'q. Birinchi bo'lib o'z fikringizni qoldiring!",
+      loginToReview: "Izoh qoldirish uchun tizimga kirishingiz kerak.",
+      reviewSuccess: "Izohingiz muvaffaqiyatli qo'shildi!",
+      reviewError: "Izoh qo'shishda xatolik yuz berdi.",
     },
     loginPage: {
       title: "Tizimga kirish",
@@ -292,6 +302,16 @@ export const translations = {
       stockAvailable: "In Stock",
       stockOut: "Out of Stock",
       noDesc: "No description available.",
+      reviewsTitle: "Reader Reviews & Ratings",
+      addReview: "Leave a Review",
+      ratingLabel: "Your Rating (1 to 5 stars)",
+      commentLabel: "Your Review",
+      submitReview: "Submit Review",
+      submitting: "Submitting...",
+      noReviews: "No reviews yet for this book. Be the first to share your thoughts!",
+      loginToReview: "Please sign in to leave a review.",
+      reviewSuccess: "Your review was added successfully!",
+      reviewError: "An error occurred while submitting your review.",
     },
     loginPage: {
       title: "Sign In",
@@ -362,19 +382,27 @@ export function getLocalizedCategoryName(
   language: Language,
   t: Dictionary
 ): string {
-  if (language === "uz") return category.name || "";
   const nameLower = (category.name || "").toLowerCase();
-  if (category.id === 1 || nameLower.includes("badiiy") || nameLower.includes("fiction")) {
-    return t.categories.badiiy;
+  if (nameLower.includes("programming") || nameLower.includes("dasturlash")) {
+    return language === "uz" ? "Dasturlash" : "Programming";
   }
-  if (category.id === 2 || nameLower.includes("shaxsiy") || nameLower.includes("personal")) {
-    return t.categories.shaxsiy;
+  if (nameLower === "science" || nameLower.includes("ilmiy")) {
+    return language === "uz" ? "Ilmiy adabiyot" : "Science";
   }
-  if (category.id === 3 || nameLower.includes("bolalar") || nameLower.includes("children")) {
-    return t.categories.bolalar;
+  if (nameLower.includes("business") || nameLower.includes("biznes")) {
+    return language === "uz" ? "Biznes va iqtisod" : "Business";
   }
-  if (category.id === 4 || nameLower.includes("ilmiy") || nameLower.includes("science")) {
-    return t.booksPage.popularScience;
+  if (nameLower.includes("history") || nameLower.includes("tarix")) {
+    return language === "uz" ? "Tarixiy kitoblar" : "History";
+  }
+  if (nameLower.includes("psychology") || nameLower.includes("psixologiya") || nameLower.includes("shaxsiy") || nameLower.includes("personal")) {
+    return language === "uz" ? "Psixologiya va shaxsiy rivojlanish" : "Psychology & Personal Growth";
+  }
+  if (nameLower.includes("badiiy") || nameLower.includes("fiction")) {
+    return language === "uz" ? "Badiiy adabiyot" : "Fiction";
+  }
+  if (nameLower.includes("bolalar") || nameLower.includes("children")) {
+    return language === "uz" ? "Bolalar adabiyoti" : "Children's Books";
   }
   return category.name || "";
 }

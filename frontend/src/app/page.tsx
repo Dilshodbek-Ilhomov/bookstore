@@ -12,10 +12,11 @@ import { useLanguageStore } from "@/store/languageStore";
 import { getLocalizedCategoryName } from "@/lib/i18n";
 
 const MOCK_CATEGORIES: Category[] = [
-  { id: 1, name: "Badiiy adabiyot" },
-  { id: 2, name: "Shaxsiy rivojlanish" },
-  { id: 3, name: "Bolalar adabiyoti" },
-  { id: 4, name: "Ilmiy-ommabop" },
+  { id: 1, name: "Programming", book_count: 5 },
+  { id: 2, name: "Science", book_count: 4 },
+  { id: 3, name: "Business", book_count: 3 },
+  { id: 4, name: "History", book_count: 4 },
+  { id: 5, name: "Psychology", book_count: 6 },
 ];
 
 export default function Home() {
@@ -28,20 +29,20 @@ export default function Home() {
     async function loadData() {
       try {
         const [booksRes, catsRes] = await Promise.all([
-          booksAPI.list({ page: 1 }),
+          booksAPI.list(),
           categoriesAPI.list(),
         ]);
-        if (booksRes?.results?.length > 0) {
-          setBooks(booksRes.results.slice(0, 4));
-        } else {
-          setBooks([]);
+        if (booksRes && Array.isArray(booksRes.results)) {
+          setBooks(booksRes.results);
+        } else if (Array.isArray(booksRes)) {
+          setBooks(booksRes);
         }
         const catsList = Array.isArray(catsRes) ? catsRes : catsRes?.results;
-        if (catsList && catsList.length > 0) {
+        if (catsList && Array.isArray(catsList) && catsList.length > 0) {
           setCategories(catsList);
         }
       } catch (err) {
-        console.error("API Error when loading books:", err);
+        console.error("API error loading home data:", err);
         setBooks([]);
       } finally {
         setLoading(false);
@@ -50,16 +51,34 @@ export default function Home() {
     loadData();
   }, []);
 
-  // Map category to localized title and description based on real category name/id
+  // Map category to localized title and description based on real category name
   const getCategoryDetails = (cat: Category) => {
     const title = getLocalizedCategoryName(cat, language, t);
     const nameLower = (cat.name || "").toLowerCase();
     let desc: string = t.categories.subtitle;
-    if (cat.id === 1 || nameLower.includes("badiiy") || nameLower.includes("fiction")) {
+    if (nameLower.includes("programming") || nameLower.includes("dasturlash")) {
+      desc = language === "uz"
+        ? "Zamonaviy dasturlash tillari, veb va mobil texnologiyalari, algoritmik fikrlash hamda dasturiy ta'minot arxitekturasi bo'yicha eng sara qo'llanmalar."
+        : "Master modern programming languages, web & mobile development, algorithms, and software architecture with top industry guides.";
+    } else if (nameLower === "science" || nameLower.includes("ilmiy")) {
+      desc = language === "uz"
+        ? "Koinot sirlari, kvant fizikasi, neyrobiologiya va zamonaviy ilm-fanning eng so'nggi va hayratlanarli kashfiyotlari dunyosi."
+        : "Explore the mysteries of the universe, quantum physics, neurobiology, and cutting-edge scientific breakthroughs.";
+    } else if (nameLower.includes("business") || nameLower.includes("biznes")) {
+      desc = language === "uz"
+        ? "Tadbirkorlik, menejment, startap strategiyalari, marketing hamda moliyaviy savodxonlik bo'yicha amaliy kitoblar."
+        : "Practical insights on entrepreneurship, management, startup strategies, marketing, and financial literacy.";
+    } else if (nameLower.includes("history") || nameLower.includes("tarix")) {
+      desc = language === "uz"
+        ? "Qadimiy sivilizatsiyalar, buyuk imperiyalar, jahon tarixini o'zgartirgan shaxslar va burilish nuqtalari haqida asarlar."
+        : "Discover ancient civilizations, great empires, legendary leaders, and the turning points that shaped world history.";
+    } else if (nameLower.includes("psychology") || nameLower.includes("psixologiya") || nameLower.includes("shaxsiy") || nameLower.includes("personal")) {
+      desc = language === "uz"
+        ? "Inson ruhiyati, o'z-o'zini rivojlantirish, odatlarni shakllantirish, hissiy intellekt va ichki xotirjamlik sari yo'l."
+        : "Understand human psychology, personal habits, emotional intelligence, productivity, and inner growth.";
+    } else if (nameLower.includes("badiiy") || nameLower.includes("fiction")) {
       desc = t.categories.badiiyDesc;
-    } else if (cat.id === 2 || nameLower.includes("shaxsiy") || nameLower.includes("personal")) {
-      desc = t.categories.shaxsiyDesc;
-    } else if (cat.id === 3 || nameLower.includes("bolalar") || nameLower.includes("children")) {
+    } else if (nameLower.includes("bolalar") || nameLower.includes("children")) {
       desc = t.categories.bolalarDesc;
     } else if (typeof cat.book_count === "number") {
       desc = language === "uz" ? `${cat.book_count} ta sara kitoblar to'plami` : `Collection of ${cat.book_count} curated books`;
@@ -86,13 +105,6 @@ export default function Home() {
                 <span>{t.featured.title}</span>
               </h2>
             </div>
-            <Link
-              href="/books"
-              className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-medium text-text-primary transition-all hover:border-gold-400/40 hover:bg-white/[0.06] mt-4 md:mt-0 active:scale-[0.98]"
-            >
-              <span>{t.featured.allBooks}</span>
-              <ArrowRight className="w-4 h-4 text-gold-400 transition-transform duration-200 group-hover:translate-x-1" />
-            </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -117,7 +129,7 @@ export default function Home() {
 
           {/* Asymmetric Bento layout */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {categories.slice(0, 4).map((category, index) => {
+            {categories.map((category, index) => {
               const bentoClasses = [
                 "md:col-span-2 bg-gradient-to-br from-gold-400/[0.08] via-navy-900/90 to-navy-950",
                 "md:col-span-1 bg-gradient-to-br from-navy-900/90 to-navy-950",

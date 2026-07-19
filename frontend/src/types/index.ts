@@ -44,6 +44,12 @@ export interface Review {
   rating: number | null;
   comment: string;
   created_at: string;
+  user_detail?: {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export interface ReviewWithUser extends Omit<Review, "user"> {

@@ -4,9 +4,21 @@ from .models import Review
 from books.models import Book
 
 class ReviewSerializer(serializers.ModelSerializer):
+    user_detail = serializers.SerializerMethodField()
+
     class Meta:
         model = Review
         fields = '__all__'
+
+    def get_user_detail(self, obj):
+        if not obj.user:
+            return None
+        return {
+            "id": obj.user.id,
+            "first_name": getattr(obj.user, "first_name", ""),
+            "last_name": getattr(obj.user, "last_name", ""),
+            "email": getattr(obj.user, "email", ""),
+        }
 
 class ReviewCreateSerializer(serializers.Serializer):
     book = serializers.IntegerField()
