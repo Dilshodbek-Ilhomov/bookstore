@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Trash, Minus, Plus, ShoppingBag, Sparkle, ArrowRight } from "@phosphor-icons/react";
+import { X, Trash, Minus, Plus, ShoppingBag, ArrowRight } from "@phosphor-icons/react";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice, getImageUrl } from "@/lib/utils";
 import { ordersAPI } from "@/lib/api";

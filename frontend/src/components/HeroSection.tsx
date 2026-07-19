@@ -4,7 +4,7 @@ import { useRef, useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowDown, BookOpen, Crown, ArrowRight, Star, Lightning } from "@phosphor-icons/react";
+import { ArrowDown, BookOpen, Crown, ArrowRight, Star } from "@phosphor-icons/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLanguageStore } from "@/store/languageStore";

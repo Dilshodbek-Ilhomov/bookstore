@@ -18,7 +18,8 @@ import {
   TrendUp,
   Hourglass,
   Brain,
-  Sparkle,
+  Compass,
+  Books,
   Crown,
 } from "@phosphor-icons/react";
 import Link from "next/link";
@@ -163,7 +164,7 @@ export default function Home() {
         accentText: "group-hover:text-gold-300",
       },
       {
-        icon: <Sparkle weight="bold" className="w-8 h-8 text-cyan-400 group-hover:scale-110 transition-transform duration-500" />,
+        icon: <Books weight="bold" className="w-8 h-8 text-cyan-400 group-hover:scale-110 transition-transform duration-500" />,
         bgCard: "bg-gradient-to-br from-cyan-400/[0.12] via-navy-900/95 to-navy-950 border-cyan-400/30 hover:border-cyan-400/80 shadow-[0_15px_35px_-12px_rgba(6,182,212,0.25)]",
         badge: "bg-cyan-400/10 border-cyan-400/30 text-cyan-300",
         glow: "bg-cyan-500/15",
@@ -242,8 +243,8 @@ export default function Home() {
         <div className="section-container">
           <div className="max-w-2xl mb-14">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text-primary mb-4 flex items-center gap-3.5">
-              <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-400/20 to-navy-900 border border-gold-400/30 shrink-0">
-                <Sparkle weight="fill" className="w-6 h-6 text-gold-400" />
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-400/20 to-navy-900 border border-gold-400/30 shrink-0 shadow-[0_0_20px_rgba(201,168,76,0.15)]">
+                <Compass weight="fill" className="w-6 h-6 text-gold-400" />
               </span>
               <span>{t.categories.title}</span>
             </h2>
