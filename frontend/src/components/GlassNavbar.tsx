@@ -50,7 +50,7 @@ export function GlassNavbar() {
           <Link
             href="/"
             aria-label="BookStore Home"
-            className="group pointer-events-auto relative inline-flex shrink-0 items-center gap-2.5 overflow-hidden rounded-2xl border border-white/10 bg-navy-900/85 px-3 py-2 shadow-[0_10px_26px_-10px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-gold-400/35 hover:bg-navy-900 hover:shadow-[0_16px_34px_-8px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.12)] active:scale-[0.98]"
+            className="group pointer-events-auto relative inline-flex shrink-0 items-center gap-2.5 overflow-hidden rounded-2xl border border-white/[0.12] bg-navy-950/[0.45] px-3 py-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-white/[0.2] hover:bg-navy-950/[0.6] hover:shadow-[0_12px_36px_-6px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.22)] active:scale-[0.98]"
           >
             <span className="sheen-overlay" aria-hidden="true" />
             <BookStoreLogo className="w-7 h-7 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-3 shrink-0" />
@@ -60,7 +60,7 @@ export function GlassNavbar() {
           </Link>
 
           {/* Desktop Nav Pills Container */}
-          <div className="pointer-events-auto hidden md:inline-flex items-center gap-1 rounded-full border border-white/10 bg-navy-900/85 px-2 py-1.5 shadow-[0_10px_26px_-10px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition-all duration-300 hover:border-white/15">
+          <div className="pointer-events-auto hidden md:inline-flex items-center gap-1 rounded-full border border-white/[0.12] bg-navy-950/[0.45] px-2 py-1.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-xl transition-all duration-300 hover:border-white/[0.18] hover:bg-navy-950/[0.55]">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -75,7 +75,7 @@ export function GlassNavbar() {
           </div>
 
           {/* Right Actions Pill */}
-          <div className="pointer-events-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-navy-900/85 px-2 py-1.5 shadow-[0_10px_26px_-10px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md">
+          <div className="pointer-events-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.12] bg-navy-950/[0.45] px-2 py-1.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-xl">
             {/* Language Switcher Segmented Control */}
             <div className="hidden md:inline-flex h-8 items-center rounded-full bg-white/[0.04] p-0.5 ring-1 ring-white/10">
               <button
@@ -161,7 +161,7 @@ export function GlassNavbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.96 }}
               transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-auto mt-3 mx-auto max-w-7xl rounded-2xl border border-white/10 bg-navy-900/95 p-3 shadow-[0_20px_40px_-14px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl md:hidden"
+              className="pointer-events-auto mt-3 mx-auto max-w-7xl rounded-2xl border border-white/[0.12] bg-navy-950/[0.65] p-3 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-2xl md:hidden"
             >
               <div className="flex flex-col gap-1">
                 {/* Mobile Language Selector */}

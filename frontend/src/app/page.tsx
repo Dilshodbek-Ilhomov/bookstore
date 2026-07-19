@@ -264,7 +264,7 @@ export default function Home() {
                 <ScrollReveal key={category.id || index} delay={index * 0.08} className={spanClass}>
                   <Link
                     href={`/books?category=${category.id}`}
-                    className={`group relative flex flex-col justify-between h-full p-7 sm:p-9 rounded-3xl border ${theme.bgCard} backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 overflow-hidden`}
+                    className={`group relative flex flex-col justify-between h-full p-5 sm:p-7 md:p-8 rounded-2xl sm:rounded-3xl border ${theme.bgCard} backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 overflow-hidden`}
                   >
                     {/* Micro-sheen reflection overlay */}
                     <span className="sheen-overlay" aria-hidden="true" />
@@ -274,39 +274,43 @@ export default function Home() {
                       className={`absolute -top-20 -right-20 w-56 h-56 rounded-full blur-[65px] ${theme.glow} opacity-60 group-hover:opacity-100 transition-all duration-700 pointer-events-none`}
                     />
 
-                    {/* Card Header: Icon & Badges */}
-                    <div className="relative z-10 flex items-start justify-between gap-4 mb-8">
-                      <div
-                        className={`w-16 h-16 rounded-2xl flex items-center justify-center border transition-all duration-500 group-hover:scale-110 shadow-lg ${theme.iconBox}`}
-                      >
-                        {theme.icon}
-                      </div>
+                    <div>
+                      {/* Card Header: Icon & Book Count Badge */}
+                      <div className="relative z-10 flex items-center justify-between gap-3 mb-5 sm:mb-6">
+                        <div
+                          className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center border transition-all duration-500 group-hover:scale-110 shadow-lg shrink-0 ${theme.iconBox}`}
+                        >
+                          {theme.icon}
+                        </div>
 
-                      <div className="flex flex-wrap items-center justify-end gap-2">
                         {typeof category.book_count === "number" && (
                           <span
-                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-mono font-bold tracking-wide border shadow-sm ${theme.badge}`}
+                            className={`inline-flex items-center rounded-full px-2.5 sm:px-3 py-1 text-xs font-mono font-bold tracking-wide border shadow-sm shrink-0 ${theme.badge}`}
                           >
                             {category.book_count} {language === "uz" ? "kitob" : "books"}
                           </span>
                         )}
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] border border-white/10 px-3.5 py-1 text-xs font-mono text-text-muted group-hover:text-white group-hover:border-white/20 transition-all">
-                          <span>{t.categories.explore}</span>
-                          <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
-                        </span>
+                      </div>
+
+                      {/* Card Body: Title & Description */}
+                      <div className="relative z-10">
+                        <h3
+                          className={`text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-text-primary ${theme.accentText} transition-colors duration-300 mb-2 sm:mb-2.5`}
+                        >
+                          {details.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm md:text-base text-text-secondary/90 leading-relaxed max-w-xl line-clamp-2 sm:line-clamp-3 group-hover:text-text-primary/95 transition-colors duration-300">
+                          {details.desc}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Card Body: Title & Description */}
-                    <div className="relative z-10">
-                      <h3
-                        className={`text-2xl sm:text-3xl font-extrabold tracking-tight text-text-primary ${theme.accentText} transition-colors duration-300 mb-3`}
-                      >
-                        {details.title}
-                      </h3>
-                      <p className="text-sm sm:text-base text-text-secondary/90 leading-relaxed max-w-xl line-clamp-3 group-hover:text-text-primary/95 transition-colors duration-300">
-                        {details.desc}
-                      </p>
+                    {/* Card Footer: Explore CTA Row */}
+                    <div className="relative z-10 mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs sm:text-sm font-semibold text-text-secondary group-hover:text-white transition-colors">
+                      <span>{t.categories.explore}</span>
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-white/[0.05] border border-white/10 group-hover:bg-white/[0.12] group-hover:border-white/20 transition-all">
+                        <span className="transition-transform duration-300 group-hover:translate-x-0.5">→</span>
+                      </span>
                     </div>
                   </Link>
                 </ScrollReveal>
