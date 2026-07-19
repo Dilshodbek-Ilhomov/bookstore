@@ -5,6 +5,7 @@
 export interface Category {
   id: number;
   name: string;
+  book_count?: number;
 }
 
 export interface Author {

@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { ordersAPI } from "@/lib/api";
 import type { Order } from "@/types";
 import { formatDate, formatPrice } from "@/lib/utils";
-import { User, SignOut, Receipt, BookOpen } from "@phosphor-icons/react";
+import { User, SignOut, Receipt, BookOpen, BellRinging, CheckCircle, XCircle, Clock, ArrowsClockwise } from "@phosphor-icons/react";
 import { useLanguageStore } from "@/store/languageStore";
 import { getLocalizedBookTitle } from "@/lib/i18n";
 
@@ -16,10 +16,46 @@ export default function ProfilePage() {
   const { language, t } = useLanguageStore();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [statusAlert, setStatusAlert] = useState<{ id: number; prev: string; next: string } | null>(null);
+  const [recentlyUpdatedId, setRecentlyUpdatedId] = useState<number | null>(null);
+  const prevOrdersRef = useRef<Order[]>([]);
 
   useEffect(() => {
     hydrate();
   }, [hydrate]);
+
+  const loadOrders = useCallback(async (isSilent = false) => {
+    if (!isAuthenticated) return;
+    if (isSilent) setSyncing(true);
+    try {
+      const res = await ordersAPI.list();
+      const newOrders = res?.results || (Array.isArray(res) ? res : []);
+      
+      // Detect if any order status changed (e.g., admin changed pending -> completed or cancelled)
+      if (prevOrdersRef.current.length > 0 && newOrders.length > 0) {
+        for (const newOrder of newOrders) {
+          const oldOrder = prevOrdersRef.current.find((o) => o.id === newOrder.id);
+          if (oldOrder && oldOrder.status !== newOrder.status) {
+            setStatusAlert({ id: newOrder.id, prev: oldOrder.status, next: newOrder.status });
+            setRecentlyUpdatedId(newOrder.id);
+            setTimeout(() => {
+              setRecentlyUpdatedId(null);
+            }, 7000);
+            break;
+          }
+        }
+      }
+
+      setOrders(newOrders);
+      prevOrdersRef.current = newOrders;
+    } catch (err) {
+      console.error("Error loading orders:", err);
+    } finally {
+      if (!isSilent) setLoading(false);
+      if (isSilent) setSyncing(false);
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -27,21 +63,30 @@ export default function ProfilePage() {
       return;
     }
 
-    async function loadOrders() {
-      try {
-        const res = await ordersAPI.list();
-        if (res?.results) {
-          setOrders(res.results);
-        }
-      } catch (err) {
-        console.error("Error loading orders:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
+    loadOrders(false);
 
-    loadOrders();
-  }, [isAuthenticated, router]);
+    // Real-Time Polling: automatically sync orders every 3.5 seconds when tab is visible
+    const intervalId = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        loadOrders(true);
+      }
+    }, 3500);
+
+    const handleFocusOrVisibility = () => {
+      if (document.visibilityState === "visible") {
+        loadOrders(true);
+      }
+    };
+
+    window.addEventListener("focus", handleFocusOrVisibility);
+    document.addEventListener("visibilitychange", handleFocusOrVisibility);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocusOrVisibility);
+      document.removeEventListener("visibilitychange", handleFocusOrVisibility);
+    };
+  }, [isAuthenticated, router, loadOrders]);
 
   const handleLogout = () => {
     logout();
@@ -82,9 +127,43 @@ export default function ProfilePage() {
 
         {/* Orders list */}
         <div className="lg:col-span-3 space-y-6">
-          <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-gold-400" /> {t.profilePage.myOrders}
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-gold-400" /> {t.profilePage.myOrders}
+            </h2>
+            <div className="flex items-center gap-2 text-xs text-text-muted">
+              <ArrowsClockwise
+                className={`w-4 h-4 text-gold-400 transition-all ${syncing ? "animate-spin opacity-100" : "opacity-40"}`}
+              />
+              <span className="font-mono text-[11px] hidden sm:inline">
+                {syncing ? (language === "uz" ? "Yangilanmoqda..." : "Syncing...") : (language === "uz" ? "Jonli aloqada (Real-time)" : "Live sync active")}
+              </span>
+            </div>
+          </div>
+
+          {/* Status Change Toast Alert */}
+          {statusAlert && (
+            <div className="p-4 rounded-2xl bg-gold-400/15 border border-gold-400 text-text-primary shadow-[0_0_25px_rgba(201,168,76,0.25)] flex items-center justify-between gap-4 animate-fade-in">
+              <div className="flex items-center gap-3">
+                <BellRinging weight="fill" className="w-6 h-6 text-gold-400 shrink-0 animate-bounce" />
+                <div className="text-xs sm:text-sm">
+                  <span className="font-bold text-gold-300">
+                    {language === "uz" ? `Buyurtma #${statusAlert.id} holati yangilandi!` : `Order #${statusAlert.id} status updated!`}
+                  </span>{" "}
+                  <span className="text-text-secondary">
+                    ({statusAlert.prev.toUpperCase()} →{" "}
+                    <strong className="text-white font-semibold">{statusAlert.next.toUpperCase()}</strong>)
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setStatusAlert(null)}
+                className="text-xs font-mono text-gold-400 hover:underline shrink-0"
+              >
+                {language === "uz" ? "Yopish" : "Dismiss"}
+              </button>
+            </div>
+          )}
 
           {loading ? (
             <div className="space-y-4">
@@ -98,59 +177,82 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {orders.map((order) => (
-                <div
-                  key={order.id}
-                  className="glass p-5 rounded-2xl border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <span className="text-xs font-mono text-gold-400 font-semibold">
-                      {t.profilePage.orderNumber}{order.id}
-                    </span>
-                    <p className="text-xs text-text-secondary">
-                      {t.profilePage.dateLabel} {formatDate(order.created_at, language)}
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {order.items?.map((item) => (
-                        <span
-                          key={item.id}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy-900 border border-white/5 text-[11px] text-text-secondary"
-                        >
-                          <BookOpen className="w-3.5 h-3.5 text-gold-400/60" />
-                          {item.book ? getLocalizedBookTitle(item.book, language, t) : ""} x {item.quantity}
+              {orders.map((order) => {
+                const isUpdated = recentlyUpdatedId === order.id;
+                return (
+                  <div
+                    key={order.id}
+                    className={`p-5 rounded-2xl border transition-all duration-500 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                      isUpdated
+                        ? "bg-gold-400/10 border-gold-400 shadow-[0_0_30px_rgba(201,168,76,0.3)] ring-2 ring-gold-400/50"
+                        : "glass border-white/5"
+                    }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-gold-400 font-semibold">
+                          {t.profilePage.orderNumber}{order.id}
                         </span>
-                      ))}
+                        {isUpdated && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-gold-400 text-navy-950 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider animate-pulse">
+                            {language === "uz" ? "Yangi holat" : "Updated"}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-text-secondary">
+                        {t.profilePage.dateLabel} {formatDate(order.created_at, language)}
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {order.items?.map((item) => (
+                          <span
+                            key={item.id}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy-900 border border-white/5 text-[11px] text-text-secondary"
+                          >
+                            <BookOpen className="w-3.5 h-3.5 text-gold-400/60" />
+                            {item.book ? getLocalizedBookTitle(item.book, language, t) : ""} x {item.quantity}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="text-right flex flex-row sm:flex-col justify-between items-center sm:items-end gap-2 shrink-0">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase transition-all duration-300 ${
+                          order.status === "completed"
+                            ? "bg-green-500/15 text-green-400 border border-green-500/30"
+                            : order.status === "cancelled"
+                              ? "bg-red-500/15 text-red-400 border border-red-500/30"
+                              : "bg-yellow-500/15 text-yellow-400 border border-yellow-500/30"
+                        }`}
+                      >
+                        {order.status === "completed" ? (
+                          <CheckCircle weight="fill" className="w-4 h-4 text-green-400" />
+                        ) : order.status === "cancelled" ? (
+                          <XCircle weight="fill" className="w-4 h-4 text-red-400" />
+                        ) : (
+                          <Clock weight="fill" className="w-4 h-4 text-yellow-400" />
+                        )}
+                        <span>
+                          {order.status === "completed"
+                            ? t.profilePage.statusCompleted
+                            : order.status === "cancelled"
+                              ? t.profilePage.statusCancelled
+                              : t.profilePage.statusPending}
+                        </span>
+                      </span>
+                      <span className="text-sm font-bold font-mono text-text-primary">
+                        {formatPrice(
+                          order.items?.reduce(
+                            (sum, item) => sum + parseFloat(item.total_price),
+                            0
+                          ) || 0,
+                          language
+                        )}
+                      </span>
                     </div>
                   </div>
-
-                  <div className="text-right flex flex-row sm:flex-col justify-between items-center sm:items-end gap-2 shrink-0">
-                    <span
-                      className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase ${
-                        order.status === "completed"
-                          ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                          : order.status === "cancelled"
-                            ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                            : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
-                      }`}
-                    >
-                      {order.status === "completed"
-                        ? t.profilePage.statusCompleted
-                        : order.status === "cancelled"
-                          ? t.profilePage.statusCancelled
-                          : t.profilePage.statusPending}
-                    </span>
-                    <span className="text-sm font-bold font-mono text-text-primary">
-                      {formatPrice(
-                        order.items?.reduce(
-                          (sum, item) => sum + parseFloat(item.total_price),
-                          0
-                        ) || 0,
-                        language
-                      )}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

@@ -10,7 +10,12 @@ class OrderViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        return (
+            Order.objects.filter(user=self.request.user)
+            .select_related("user")
+            .prefetch_related("items__book__authors", "items__book__category")
+            .order_by("-created_at")
+        )
 
     def get_serializer_class(self):
         if self.action == "create":

@@ -25,6 +25,7 @@ function BooksContent() {
   const currentCategory = searchParams.get("category");
   const currentSearch = searchParams.get("search") || "";
   const currentOrdering = searchParams.get("ordering") || "";
+  const currentView = searchParams.get("view");
 
   const [books, setBooks] = useState<Book[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -51,8 +52,9 @@ function BooksContent() {
           setBooks([]);
         }
 
-        if (catsRes?.results?.length > 0) {
-          setCategories(catsRes.results);
+        const catsList = Array.isArray(catsRes) ? catsRes : catsRes?.results;
+        if (catsList && catsList.length > 0) {
+          setCategories(catsList);
         } else {
           setCategories(FALLBACK_CATEGORIES);
         }
@@ -86,9 +88,45 @@ function BooksContent() {
     <div className="section-container pt-32 pb-20">
       {/* Title */}
       <div className="mb-10 text-center md:text-left">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">{t.booksPage.title}</h1>
-        <p className="text-text-secondary text-sm">{t.booksPage.subtitle}</p>
+        <h1 className="text-3xl font-bold tracking-tight mb-2">
+          {currentView === "categories" ? t.categories.title : t.booksPage.title}
+        </h1>
+        <p className="text-text-secondary text-sm">
+          {currentView === "categories" ? t.categories.subtitle : t.booksPage.subtitle}
+        </p>
       </div>
+
+      {/* Category exploration view when clicked from navbar/footer */}
+      {currentView === "categories" && (
+        <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => {
+                updateFilters("category", String(cat.id));
+                updateFilters("view", null);
+              }}
+              className={`p-5 rounded-2xl border text-left transition-all ${
+                currentCategory === String(cat.id)
+                  ? "bg-gold-400/15 border-gold-400 text-gold-400 shadow-[0_0_20px_rgba(201,168,76,0.2)]"
+                  : "glass hover:border-gold-400/40 text-text-primary"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-base">{getLocalizedCategoryName(cat, language, t)}</span>
+                {typeof cat.book_count === "number" && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 font-mono text-gold-400">
+                    {cat.book_count}
+                  </span>
+                )}
+              </div>
+              <span className="text-xs text-text-secondary">
+                {language === "uz" ? "Kitoblarni ko'rish →" : "Explore books →"}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Filters Sidebar */}
@@ -123,18 +161,21 @@ function BooksContent() {
                 {t.booksPage.filterAll}
               </button>
               {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => updateFilters("category", String(cat.id))}
-                    className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                      currentCategory === String(cat.id)
-                        ? "bg-gold-400/10 text-gold-400"
-                        : "text-text-secondary hover:text-text-primary hover:bg-white/[0.02]"
-                    }`}
-                  >
-                    {getLocalizedCategoryName(cat, language, t)}
-                  </button>
-                ))}
+                <button
+                  key={cat.id}
+                  onClick={() => updateFilters("category", String(cat.id))}
+                  className={`text-left px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center justify-between ${
+                    currentCategory === String(cat.id)
+                      ? "bg-gold-400/10 text-gold-400 font-semibold"
+                      : "text-text-secondary hover:text-text-primary hover:bg-white/[0.02]"
+                  }`}
+                >
+                  <span>{getLocalizedCategoryName(cat, language, t)}</span>
+                  {typeof cat.book_count === "number" && (
+                    <span className="text-[10px] opacity-75 font-mono">({cat.book_count})</span>
+                  )}
+                </button>
+              ))}
             </div>
           </div>
 

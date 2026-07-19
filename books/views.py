@@ -11,12 +11,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = CategorySerializer
+    pagination_class = None
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = AuthorSerializer
+    pagination_class = None
 
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()

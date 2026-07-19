@@ -36,8 +36,9 @@ export default function Home() {
         } else {
           setBooks([]);
         }
-        if (catsRes?.results?.length > 0) {
-          setCategories(catsRes.results);
+        const catsList = Array.isArray(catsRes) ? catsRes : catsRes?.results;
+        if (catsList && catsList.length > 0) {
+          setCategories(catsList);
         }
       } catch (err) {
         console.error("API Error when loading books:", err);
@@ -49,12 +50,21 @@ export default function Home() {
     loadData();
   }, []);
 
-  // Map mock category IDs to localized descriptions and titles if available
-  const getCategoryDetails = (cat: Category, index: number) => {
-    if (index === 0) return { title: t.categories.badiiy, desc: t.categories.badiiyDesc };
-    if (index === 1) return { title: t.categories.shaxsiy, desc: t.categories.shaxsiyDesc };
-    if (index === 2) return { title: t.categories.bolalar, desc: t.categories.bolalarDesc };
-    return { title: getLocalizedCategoryName(cat, language, t), desc: t.categories.subtitle };
+  // Map category to localized title and description based on real category name/id
+  const getCategoryDetails = (cat: Category) => {
+    const title = getLocalizedCategoryName(cat, language, t);
+    const nameLower = (cat.name || "").toLowerCase();
+    let desc: string = t.categories.subtitle;
+    if (cat.id === 1 || nameLower.includes("badiiy") || nameLower.includes("fiction")) {
+      desc = t.categories.badiiyDesc;
+    } else if (cat.id === 2 || nameLower.includes("shaxsiy") || nameLower.includes("personal")) {
+      desc = t.categories.shaxsiyDesc;
+    } else if (cat.id === 3 || nameLower.includes("bolalar") || nameLower.includes("children")) {
+      desc = t.categories.bolalarDesc;
+    } else if (typeof cat.book_count === "number") {
+      desc = language === "uz" ? `${cat.book_count} ta sara kitoblar to'plami` : `Collection of ${cat.book_count} curated books`;
+    }
+    return { title, desc };
   };
 
   return (
@@ -94,7 +104,7 @@ export default function Home() {
       </section>
 
       {/* Bento categories grid (TasteSkill Asymmetric Layout) */}
-      <section className="section-spacing relative z-10">
+      <section id="categories" className="section-spacing relative z-10">
         <div className="section-container">
           <div className="max-w-2xl mb-14">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text-primary mb-4">
@@ -107,13 +117,14 @@ export default function Home() {
 
           {/* Asymmetric Bento layout */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {categories.slice(0, 3).map((category, index) => {
+            {categories.slice(0, 4).map((category, index) => {
               const bentoClasses = [
                 "md:col-span-2 bg-gradient-to-br from-gold-400/[0.08] via-navy-900/90 to-navy-950",
                 "md:col-span-1 bg-gradient-to-br from-navy-900/90 to-navy-950",
-                "md:col-span-3 bg-gradient-to-r from-navy-900/90 via-gold-400/[0.06] to-navy-950",
+                "md:col-span-1 bg-gradient-to-br from-navy-900/90 to-navy-950",
+                "md:col-span-2 bg-gradient-to-r from-navy-900/90 via-gold-400/[0.06] to-navy-950",
               ];
-              const details = getCategoryDetails(category, index);
+              const details = getCategoryDetails(category);
               return (
                 <ScrollReveal key={category.id} delay={index * 0.1}>
                   <Link
@@ -126,16 +137,23 @@ export default function Home() {
                       <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:border-gold-400/40">
                         <BookOpen weight="thin" className="w-7 h-7 text-gold-400" />
                       </div>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.04] border border-white/5 px-3 py-1 text-xs font-mono text-text-muted group-hover:text-gold-300 transition-colors">
-                        {t.categories.explore} →
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {typeof category.book_count === "number" && (
+                          <span className="inline-flex items-center rounded-full bg-gold-400/10 border border-gold-400/20 px-2.5 py-0.5 text-[11px] font-mono font-semibold text-gold-300">
+                            {category.book_count} {language === "uz" ? "kitob" : "books"}
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.04] border border-white/5 px-3 py-1 text-xs font-mono text-text-muted group-hover:text-gold-300 transition-colors">
+                          {t.categories.explore} →
+                        </span>
+                      </div>
                     </div>
 
                     <div>
                       <h3 className="text-xl sm:text-2xl font-bold text-text-primary group-hover:text-gold-300 transition-colors mb-2">
                         {details.title}
                       </h3>
-                      <p className="text-sm text-text-secondary max-w-md">
+                      <p className="text-sm text-text-secondary max-w-md line-clamp-2">
                         {details.desc}
                       </p>
                     </div>
