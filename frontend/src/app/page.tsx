@@ -214,17 +214,24 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="flex flex-wrap justify-center items-stretch gap-6 sm:gap-7">
             {loading
               ? Array.from({ length: 5 }).map((_, i) => (
                   <div
                     key={i}
-                    className="aspect-[3/4] rounded-3xl bg-navy-900/60 animate-pulse border border-white/5"
+                    className="w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1.2rem)] lg:w-[calc(20%-1.2rem)] max-w-[340px] aspect-[3/4] rounded-3xl bg-navy-900/60 animate-pulse border border-white/5"
                   />
                 ))
               : books
                   .slice(0, 5)
-                  .map((book) => <BookCard key={book.id} book={book} />)}
+                  .map((book) => (
+                    <div
+                      key={book.id}
+                      className="w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1.2rem)] lg:w-[calc(20%-1.2rem)] max-w-[340px] flex flex-col"
+                    >
+                      <BookCard book={book} />
+                    </div>
+                  ))}
           </div>
 
           <div className="mt-12 text-center">

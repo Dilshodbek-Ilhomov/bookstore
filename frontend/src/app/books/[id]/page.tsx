@@ -17,9 +17,11 @@ import {
   PaperPlaneRight,
   CheckCircle,
   Warning,
+  DownloadSimple,
 } from "@phosphor-icons/react";
 import { useLanguageStore } from "@/store/languageStore";
 import { getLocalizedBookTitle, getLocalizedBookDesc } from "@/lib/i18n";
+import { PDFReaderModal } from "@/components/PDFReaderModal";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -30,6 +32,7 @@ export default function BookDetailPage({ params }: PageProps) {
   const bookId = parseInt(resolvedParams.id);
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -212,15 +215,24 @@ export default function BookDetailPage({ params }: PageProps) {
               </button>
 
               {book.book_file && (
-                <a
-                  href={getImageUrl(book.book_file)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-ghost text-sm flex items-center justify-center gap-2"
-                >
-                  <FilePdf className="w-4 h-4 text-red-400" />
-                  <span>{t.bookDetail.readPdf}</span>
-                </a>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsPdfModalOpen(true)}
+                    className="btn-ghost text-sm flex items-center justify-center gap-2 border-gold-400/30 hover:border-gold-400 text-gold-300 hover:text-white transition-all shadow-sm"
+                  >
+                    <FilePdf weight="fill" className="w-4 h-4 text-red-400" />
+                    <span>{t.bookDetail.readPdf}</span>
+                  </button>
+                  <a
+                    href={`/api/proxy-pdf?url=${encodeURIComponent(getImageUrl(book.book_file))}&download=1`}
+                    className="btn-ghost text-sm flex items-center justify-center gap-1.5 border-white/10 hover:border-gold-400/40 text-text-secondary hover:text-gold-300 transition-all shadow-sm px-3.5"
+                    title={language === "uz" ? "Srazu yuklab olish" : "Instant Download"}
+                  >
+                    <DownloadSimple weight="bold" className="w-4 h-4 text-gold-400" />
+                    <span className="hidden sm:inline">{language === "uz" ? "Yuklab olish" : "Download"}</span>
+                  </a>
+                </div>
               )}
             </div>
 
@@ -424,6 +436,15 @@ export default function BookDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {book?.book_file && (
+        <PDFReaderModal
+          isOpen={isPdfModalOpen}
+          onClose={() => setIsPdfModalOpen(false)}
+          title={getLocalizedBookTitle(book, language, t)}
+          pdfUrl={getImageUrl(book.book_file)}
+        />
+      )}
     </div>
   );
 }
