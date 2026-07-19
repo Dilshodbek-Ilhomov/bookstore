@@ -17,7 +17,7 @@ export const NAV_LINKS = [
   { label: "Bosh sahifa", href: "/" },
   { label: "Kitoblar", href: "/books" },
   { label: "Kategoriyalar", href: "/books?view=categories" },
-  { label: "Biz haqimizda", href: "#about" },
+  // { label: "Biz haqimizda", href: "#about" },
 ] as const;
 
 // Design tokens

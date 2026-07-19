@@ -34,7 +34,7 @@ export function GlassNavbar() {
     { label: t.nav.home, href: "/" },
     { label: t.nav.books, href: "/books" },
     { label: t.nav.categories, href: "/books?view=categories" },
-    { label: t.nav.about, href: "#about" },
+    // { label: t.nav.about, href: "#about" },
   ];
 
   return (
