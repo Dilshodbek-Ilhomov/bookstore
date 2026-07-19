@@ -175,22 +175,21 @@ export default function Home() {
     return fallbacks[index % fallbacks.length];
   };
 
-  // Dynamic gapless 6-column bento span layout (ensures rows fill up perfectly without blank spots)
   const getBentoSpan = (idx: number, total: number) => {
     if (total === 5) {
       // Top row: 2 large feature cards (3 + 3 = 6 cols)
       // Bottom row: 3 equal cards (2 + 2 + 2 = 6 cols)
-      if (idx === 0 || idx === 1) return "md:col-span-3 min-h-[300px] sm:min-h-[330px]";
-      return "md:col-span-2 min-h-[270px] sm:min-h-[300px]";
+      if (idx === 0 || idx === 1) return "col-span-1 sm:col-span-1 md:col-span-3 min-h-[260px]";
+      return "col-span-1 sm:col-span-1 md:col-span-2 min-h-[240px]";
     }
     if (total === 6) {
-      return "md:col-span-2 min-h-[280px] sm:min-h-[310px]";
+      return "col-span-1 sm:col-span-1 md:col-span-2 min-h-[240px]";
     }
     if (total === 4) {
-      return "md:col-span-3 min-h-[300px] sm:min-h-[330px]";
+      return "col-span-1 sm:col-span-1 md:col-span-3 min-h-[260px]";
     }
     const pattern = ["md:col-span-3", "md:col-span-3", "md:col-span-2", "md:col-span-2", "md:col-span-2"];
-    return (pattern[idx % pattern.length] || "md:col-span-2") + " min-h-[280px] sm:min-h-[310px]";
+    return "col-span-1 sm:col-span-1 " + (pattern[idx % pattern.length] || "md:col-span-2") + " min-h-[240px]";
   };
 
   return (
@@ -261,7 +260,7 @@ export default function Home() {
           </div>
 
           {/* Gapless 6-column Dynamic Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-6 sm:gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-5 sm:gap-6">
             {categories.map((category, index) => {
               const theme = getCategoryTheme(category, index);
               const details = getCategoryDetails(category);

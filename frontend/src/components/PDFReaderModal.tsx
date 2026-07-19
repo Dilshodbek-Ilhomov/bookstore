@@ -27,14 +27,31 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
   const [downloading, setDownloading] = useState(false);
   const [viewMode, setViewMode] = useState<"canvas" | "iframe">("canvas");
 
+  // Body scroll bloklash — iOS-friendly: position:fixed + top saqlash
   useEffect(() => {
     if (!isOpen) return;
-    const originalOverflow = document.body.style.overflow;
+    const scrollY = window.scrollY;
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      // Scroll pozitsiyasini tiklash
+      window.scrollTo({ top: scrollY, behavior: "instant" as ScrollBehavior });
     };
   }, [isOpen]);
+
+  // ESC bilan yopish
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !pdfUrl) return null;
 
@@ -74,13 +91,18 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[110] flex items-center justify-center p-1.5 sm:p-4 md:p-6 pointer-events-auto">
+      {/* touchAction:none — backdrop scrollni tutib olmaydi */}
+      <div
+        className="fixed inset-0 z-[110] flex items-center justify-center p-1.5 sm:p-4 md:p-6"
+        style={{ touchAction: "none" }}
+      >
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
           className="absolute inset-0 bg-navy-950/90 backdrop-blur-2xl"
+          style={{ touchAction: "none" }}
         />
 
         <motion.div
@@ -88,7 +110,8 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 flex flex-col w-full max-w-6xl h-[94vh] sm:h-[90vh] rounded-2xl sm:rounded-3xl border border-white/15 bg-navy-900 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)] overflow-hidden"
+          className="relative z-10 flex flex-col w-full max-w-6xl rounded-2xl sm:rounded-3xl border border-white/15 bg-navy-900 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)] overflow-hidden"
+          style={{ height: "94svh", maxHeight: "94svh", touchAction: "auto" }}
         >
           <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 bg-navy-950/90 border-b border-white/10 shrink-0 gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 pr-2">
@@ -176,13 +199,14 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
             </div>
           </div>
 
-          <div className="flex-1 w-full relative bg-navy-950/95 overflow-hidden flex flex-col">
+          <div className="flex-1 w-full relative bg-navy-950/95 overflow-hidden flex flex-col min-h-0">
             {viewMode === "iframe" ? (
               <div className="w-full h-full">
                 <iframe
                   src={proxyViewUrl}
                   className="w-full h-full border-0 select-none"
                   title={`${title} PDF Viewer`}
+                  style={{ touchAction: "auto" }}
                 />
               </div>
             ) : (
@@ -209,6 +233,21 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [scale, setScale] = useState<number>(1.2);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Mobil qurilmalarda Lenis va body scroll interception'ni o'chirish
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    // Passive touch listeners — scroll'ni blokirovka qilmaydi
+    const stop = (e: TouchEvent) => e.stopPropagation();
+    container.addEventListener("touchstart", stop, { passive: true });
+    container.addEventListener("touchmove", stop, { passive: true });
+    return () => {
+      container.removeEventListener("touchstart", stop);
+      container.removeEventListener("touchmove", stop);
+    };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -244,7 +283,7 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
   }, [url]);
 
   return (
-    <div className="flex-1 flex flex-col w-full h-full overflow-hidden">
+    <div className="flex-1 flex flex-col w-full h-full overflow-hidden min-h-0">
       <div className="flex items-center justify-between px-3 sm:px-6 py-2 bg-navy-900/80 border-b border-white/5 shrink-0 z-10 text-xs text-text-secondary">
         <div className="flex items-center gap-2 font-mono">
           <span>{pdf ? `${pdf.numPages} ${language === "uz" ? "sahifa" : "pages"}` : "..."}</span>
@@ -272,7 +311,29 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
         </div>
       </div>
 
-      <div className="flex-1 w-full overflow-y-auto overflow-x-auto p-3 sm:p-6 space-y-6 overscroll-contain">
+      {/*
+        ASOSIY FIX — Scroll container:
+        - overflow-y: scroll (auto emas — mobil uchun ishonchliroq)
+        - -webkit-overflow-scrolling: touch → iOS momentum scroll
+        - touch-action: pan-y pinch-zoom → vertikal scroll + pinch ruxsat
+        - overscroll-behavior: contain → body scroll'ga o'tib ketmaydi
+        - data-lenis-prevent → Lenis bu containerda scroll intercept qilmasin
+        - min-h-0 → flex parent'dan to'g'ri o'lcham
+      */}
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 w-full p-3 sm:p-6 space-y-6"
+        style={{
+          overflowY: "scroll",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch" as any,
+          touchAction: "pan-y pinch-zoom",
+          overscrollBehavior: "contain",
+          minHeight: 0,
+          position: "relative",
+        }}
+        data-lenis-prevent
+      >
         {loading && (
           <div className="w-full h-80 flex flex-col items-center justify-center text-center gap-3">
             <Spinner className="w-10 h-10 animate-spin text-gold-400" />
@@ -389,7 +450,10 @@ function PDFPageCanvas({
   }, [pdf, pageNumber, scale]);
 
   return (
-    <div className="relative flex flex-col items-center bg-navy-900/90 border border-white/10 rounded-2xl p-2 sm:p-4 shadow-2xl max-w-full overflow-x-auto">
+    <div
+      className="relative flex flex-col items-center bg-navy-900/90 border border-white/10 rounded-2xl p-2 sm:p-4 shadow-2xl max-w-full"
+      style={{ overflowX: "auto", touchAction: "pan-x pan-y pinch-zoom" }}
+    >
       <div className="text-[11px] font-mono font-bold text-gold-400 mb-2 px-3 py-0.5 rounded-full bg-navy-950/80 border border-white/5">
         {language === "uz" ? `Sahifa ${pageNumber} / ${pdf.numPages}` : `Page ${pageNumber} / ${pdf.numPages}`}
       </div>
@@ -398,7 +462,11 @@ function PDFPageCanvas({
           <Spinner className="w-8 h-8 animate-spin text-gold-400" />
         </div>
       )}
-      <canvas ref={canvasRef} className="max-w-full h-auto rounded-lg shadow-md bg-white select-none" />
+      <canvas
+        ref={canvasRef}
+        className="max-w-full h-auto rounded-lg shadow-md bg-white select-none"
+        style={{ display: "block" }}
+      />
     </div>
   );
 }

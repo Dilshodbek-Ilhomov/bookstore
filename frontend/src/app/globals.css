@@ -48,30 +48,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: none;
 }
 
-/* ---- Apple iOS & Mac Hardware Acceleration / GPU Polish ---- */
-/* Forces GPU compositing layers for interactive cards & animated containers so low-end mobile CPUs never stutter */
+/* ---- GPU compositing layers — faqat animatsiya va glass elementlar uchun ---- */
 .gpu-layer,
-.group,
-.sheen-overlay,
 .glass,
 .glass-subtle {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  -webkit-perspective: 1000px;
-  perspective: 1000px;
 }
 
-/* Optimize painting & rendering for large lists of cards on low-end mobile devices */
-.content-visibility-auto {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 350px;
-}
+/* content-visibility olib tashlandi — Lenis scroll height hisoblashini buzadi */
 
 /* Apple iOS & Mobile Touch Polish */
 a,

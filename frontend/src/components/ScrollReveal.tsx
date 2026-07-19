@@ -43,12 +43,7 @@ export function ScrollReveal({
       className={className}
       initial={{ opacity: 0, ...getDirectionOffset() }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: "-10px" }}
-      style={{
-        WebkitTransform: "translateZ(0)",
-        transform: "translateZ(0)",
-        willChange: "transform, opacity",
-      }}
+      viewport={{ once: true, margin: "-50px", amount: 0.05 }}
       transition={{
         duration,
         delay,
