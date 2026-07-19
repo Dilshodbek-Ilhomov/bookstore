@@ -6,7 +6,7 @@ export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   (process.env.NODE_ENV === "development"
     ? "http://127.0.0.1:8000/api"
-    : "https://book-store.uz/api");
+    : "https://api.book-store.uz/api");
 
 export const SITE_NAME = "BookStore";
 export const SITE_TAGLINE = "Read More, Grow More";

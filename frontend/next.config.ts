@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
         hostname: "www.book-store.uz",
         pathname: "/media/**",
       },
+      {
+        protocol: "https",
+        hostname: "api.book-store.uz",
+        pathname: "/media/**",
+      },
     ],
   },
 };

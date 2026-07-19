@@ -12,18 +12,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Format price in UZS
+ * Format price as USD — prices are stored in USD in the database
  */
-export function formatPrice(price: string | number, lang: "uz" | "en" = "uz"): string {
+export function formatPrice(price: string | number, _lang?: "uz" | "en"): string {
   const num = typeof price === "string" ? parseFloat(price) : price;
-  // Convert from UZS (database format) to USD ($) using a fixed rate of 12500 UZS = 1 USD
-  const usdPrice = num / 12500;
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(usdPrice);
+  }).format(num);
 }
 
 /**
