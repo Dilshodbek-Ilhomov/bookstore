@@ -58,7 +58,8 @@ export function CartDrawer() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
+            style={{ WebkitTransform: "translateZ(0)", transform: "translateZ(0)" }}
             onClick={closeCart}
             className="fixed inset-0 z-50 bg-navy-950/80 backdrop-blur-md"
           />
@@ -69,8 +70,9 @@ export function CartDrawer() {
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
+            style={{ WebkitTransform: "translateZ(0)", transform: "translateZ(0)", willChange: "transform" }}
             transition={{ type: "spring", damping: 28, stiffness: 220 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:max-w-md bg-gradient-to-b from-navy-950 via-[#0a0f1d] to-navy-950 border-l border-gold-400/30 sm:rounded-l-3xl flex flex-col shadow-[-20px_0_60px_rgba(201,168,76,0.18)] overflow-hidden"
+            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:max-w-md bg-gradient-to-b from-navy-950 via-[#0a0f1d] to-navy-950 border-l border-gold-400/30 sm:rounded-l-3xl flex flex-col shadow-[-20px_0_60px_rgba(201,168,76,0.18)] overflow-hidden gpu-layer"
           >
             {/* Top glowing neon accent line */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent opacity-80 shadow-[0_0_15px_#c9a84c]" aria-hidden="true" />

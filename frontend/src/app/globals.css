@@ -36,6 +36,8 @@
 html {
   scroll-behavior: auto; /* Lenis handles smooth scroll */
   color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -44,7 +46,48 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+/* ---- Apple iOS & Mac Hardware Acceleration / GPU Polish ---- */
+/* Forces GPU compositing layers for interactive cards & animated containers so low-end mobile CPUs never stutter */
+.gpu-layer,
+.group,
+.sheen-overlay,
+.glass,
+.glass-subtle {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Optimize painting & rendering for large lists of cards on low-end mobile devices */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 350px;
+}
+
+/* Apple iOS & Mobile Touch Polish */
+a,
+button,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Fallback for low-power mobile GPUs to prevent heavy backdrop-filter frame drops */
+@media (max-width: 768px), (prefers-reduced-motion: reduce) {
+  .glass,
+  .glass-subtle {
+    backdrop-filter: blur(12px) saturate(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+  }
 }
 
 /* ---- Disable Image Drag & Selection across the platform ---- */
