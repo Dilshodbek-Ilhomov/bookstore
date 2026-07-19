@@ -24,6 +24,8 @@ export interface Book {
   category_detail?: Category;       // Nested category object from API
   authors: number[];
   authors_detail?: Author[];        // Nested authors array from API
+  avg_rating: number | null;        // Real average from reviews (null = no reviews yet)
+  review_count: number;             // Total number of reviews
   created_at: string;
 }
 
