@@ -219,7 +219,7 @@ export default function Home() {
               ? Array.from({ length: 5 }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1.2rem)] lg:w-[calc(20%-1.2rem)] max-w-[340px] aspect-[3/4] rounded-3xl bg-navy-900/60 animate-pulse border border-white/5"
+                    className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-1rem)] lg:w-[calc(20%-1.2rem)] max-w-[340px] aspect-[3/4] rounded-2xl sm:rounded-3xl bg-navy-900/60 animate-pulse border border-white/5"
                   />
                 ))
               : books
@@ -227,7 +227,7 @@ export default function Home() {
                   .map((book) => (
                     <div
                       key={book.id}
-                      className="w-full sm:w-[calc(50%-1rem)] md:w-[calc(33.333%-1.2rem)] lg:w-[calc(20%-1.2rem)] max-w-[340px] flex flex-col"
+                      className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-1rem)] lg:w-[calc(20%-1.2rem)] max-w-[340px] flex flex-col"
                     >
                       <BookCard book={book} />
                     </div>

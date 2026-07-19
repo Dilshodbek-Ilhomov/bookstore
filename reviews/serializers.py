@@ -49,3 +49,18 @@ class ReviewCreateSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         return ReviewSerializer(instance).data
+
+class ReviewUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            instance.rating = validated_data.get('rating', instance.rating)
+            instance.comment = validated_data.get('comment', instance.comment)
+            instance.save()
+            return instance
+
+    def to_representation(self, instance):
+        return ReviewSerializer(instance).data

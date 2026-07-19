@@ -15,6 +15,7 @@ interface PDFReaderModalProps {
 export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModalProps) {
   const { language } = useLanguageStore();
   const [downloading, setDownloading] = useState(false);
+  const [forceMobileIframe, setForceMobileIframe] = useState(false);
 
   if (!isOpen || !pdfUrl) return null;
 
@@ -143,24 +144,83 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
             </div>
           </div>
 
-          {/* Reader Body */}
-          <div className="flex-1 w-full relative bg-navy-950/60 overflow-hidden">
-            <iframe
-              src={proxyViewUrl}
-              className="w-full h-full border-0 select-none"
-              title={`${title} PDF Viewer`}
-            />
-
-            {/* Mobile note bar at bottom if iframe is restricted */}
-            <div className="sm:hidden absolute bottom-0 inset-x-0 bg-navy-950/95 border-t border-white/10 px-4 py-2.5 flex items-center justify-between text-xs text-text-secondary z-20">
-              <span>{language === "uz" ? "Fayl to'liq ochilmadimi?" : "File not fully visible?"}</span>
-              <button
-                onClick={handleInstantDownload}
-                className="text-gold-400 font-bold underline ml-2"
-              >
-                {language === "uz" ? "Srazu yuklab oling" : "Download directly"}
-              </button>
+          {/* Reader Body (Desktop vs Mobile Presentation) */}
+          <div className="flex-1 w-full relative bg-navy-950/60 overflow-hidden flex flex-col">
+            {/* Desktop Iframe View */}
+            <div className={`w-full h-full ${forceMobileIframe ? "block" : "hidden sm:block"}`}>
+              <iframe
+                src={proxyViewUrl}
+                className="w-full h-full border-0 select-none"
+                title={`${title} PDF Viewer`}
+              />
             </div>
+
+            {/* Premium Mobile Presentation Deck (Bypasses broken mobile iframe rendering) */}
+            {!forceMobileIframe && (
+              <div className="sm:hidden flex-1 w-full flex flex-col items-center justify-center p-6 bg-gradient-to-b from-navy-950 via-navy-900 to-navy-950 overflow-y-auto text-center">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-gold-400/20 via-red-500/15 to-navy-800 border border-gold-400/30 flex items-center justify-center mb-5 shadow-[0_0_40px_rgba(201,168,76,0.25)] ring-1 ring-white/10">
+                  <FilePdf weight="fill" className="w-10 h-10 text-gold-400 animate-pulse" />
+                </div>
+
+                <h4 className="text-lg font-serif font-bold text-text-primary mb-2 line-clamp-2 px-2">
+                  {title}
+                </h4>
+
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-mono text-xs mb-4">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
+                  {language === "uz" ? "Raqamli kitob tayyor" : "Digital Book Ready"}
+                </span>
+
+                <p className="text-xs text-text-secondary max-w-xs leading-relaxed mb-6">
+                  {language === "uz"
+                    ? "Mobil telefonlarda PDF kitoblarni 100% tiniq va tezkor o'qish uchun maxsus keng ekranda oching yoki faylni yuklab oling:"
+                    : "For the cleanest reading experience on mobile devices, open directly in full-screen native reader or download:"}
+                </p>
+
+                <div className="w-full max-w-xs space-y-3">
+                  <button
+                    type="button"
+                    onClick={handleOpenExternal}
+                    className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 text-navy-950 font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-[0_12px_35px_-8px_rgba(201,168,76,0.5)] active:scale-95 transition-all"
+                  >
+                    <ArrowSquareOut weight="bold" className="w-5 h-5 shrink-0" />
+                    <span>{language === "uz" ? "📑 Keng ekranda o'qish (To'liq)" : "📑 Read in Fullscreen"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleInstantDownload}
+                    disabled={downloading}
+                    className="w-full py-4 px-6 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-text-primary font-bold text-sm flex items-center justify-center gap-2.5 shadow-md active:scale-95 transition-all disabled:opacity-50"
+                  >
+                    {downloading ? (
+                      <Spinner className="w-5 h-5 animate-spin text-gold-400 shrink-0" />
+                    ) : (
+                      <DownloadSimple weight="bold" className="w-5 h-5 text-gold-400 shrink-0" />
+                    )}
+                    <span>
+                      {downloading
+                        ? language === "uz"
+                          ? "Yuklanmoqda..."
+                          : "Downloading..."
+                        : language === "uz"
+                          ? "⚡ Faylni yuklab olish (.PDF)"
+                          : "⚡ Download File (.PDF)"}
+                    </span>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setForceMobileIframe(true)}
+                  className="mt-6 text-xs text-text-muted hover:text-gold-400 underline transition-colors"
+                >
+                  {language === "uz"
+                    ? "Yoki kichik oynaning o'zida o'qishni ko'rish"
+                    : "Or view inside mini modal preview"}
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>

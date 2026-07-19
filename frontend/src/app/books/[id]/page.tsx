@@ -18,6 +18,8 @@ import {
   CheckCircle,
   Warning,
   DownloadSimple,
+  PencilSimple,
+  Trash,
 } from "@phosphor-icons/react";
 import { useLanguageStore } from "@/store/languageStore";
 import { getLocalizedBookTitle, getLocalizedBookDesc } from "@/lib/i18n";
@@ -45,8 +47,14 @@ export default function BookDetailPage({ params }: PageProps) {
 
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { user, isAuthenticated } = useAuthStore();
   const { language, t } = useLanguageStore();
+
+  // Review editing states
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
+  const [editRating, setEditRating] = useState<number>(5);
+  const [editComment, setEditComment] = useState<string>("");
+  const [updatingReview, setUpdatingReview] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -64,7 +72,6 @@ export default function BookDetailPage({ params }: PageProps) {
         setReviews(reviewsList);
       } catch (err) {
         console.error("API error fetching book/reviews:", err);
-        setBook(null);
       } finally {
         setLoading(false);
         setReviewsLoading(false);
@@ -75,17 +82,18 @@ export default function BookDetailPage({ params }: PageProps) {
 
   const handleAddToCart = () => {
     if (!book) return;
-    addItem(book);
+    addItem(book as unknown as Book);
     openCart();
   };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!comment.trim() || submitting) return;
-    setSubmitting(true);
-    setSubmitSuccess(null);
-    setSubmitError(null);
+    if (!isAuthenticated) return;
+    if (!comment.trim()) return;
+
     try {
+      setSubmitting(true);
+      setSubmitError(null);
       const newReview = await reviewsAPI.create({
         book: bookId,
         rating,
@@ -112,6 +120,72 @@ export default function BookDetailPage({ params }: PageProps) {
       setTimeout(() => setSubmitError(null), 5000);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleStartEdit = (review: Review) => {
+    setEditingReviewId(review.id);
+    setEditRating(review.rating || 5);
+    setEditComment(review.comment || "");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingReviewId(null);
+    setEditRating(5);
+    setEditComment("");
+  };
+
+  const handleUpdateReview = async (reviewId: number) => {
+    if (!editComment.trim()) return;
+    try {
+      setUpdatingReview(true);
+      const updated = await reviewsAPI.update(reviewId, {
+        rating: editRating,
+        comment: editComment.trim(),
+      });
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.id === reviewId
+            ? { ...r, rating: updated.rating, comment: updated.comment }
+            : r
+        )
+      );
+      setEditingReviewId(null);
+    } catch (err) {
+      console.error("Error updating review:", err);
+      alert(
+        language === "uz"
+          ? "Izohni tahrirlashda xatolik yuz berdi."
+          : "Error updating review."
+      );
+    } finally {
+      setUpdatingReview(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: number) => {
+    const confirmMsg =
+      language === "uz"
+        ? "Haqiqatan ham ushbu izohingizni o'chirmoqchimisiz?"
+        : "Are you sure you want to delete this review?";
+    if (!window.confirm(confirmMsg)) return;
+    try {
+      await reviewsAPI.delete(reviewId);
+      setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+      if (book && book.review_count && book.review_count > 0) {
+        const newCount = book.review_count - 1;
+        setBook({
+          ...book,
+          review_count: newCount,
+        });
+      }
+    } catch (err) {
+      console.error("Error deleting review:", err);
+      alert(
+        language === "uz"
+          ? "Izohni o'chirishda xatolik yuz berdi."
+          : "Error deleting review."
+      );
     }
   };
 
@@ -203,38 +277,45 @@ export default function BookDetailPage({ params }: PageProps) {
             </p>
           </div>
 
-          <div className="pt-6 border-t border-navy-600/20 space-y-4 mt-6">
-            {/* Purchase CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md">
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 btn-gold text-sm flex items-center justify-center gap-2"
-              >
-                <ShoppingCart weight="bold" className="w-4 h-4" />
-                <span>{t.bookDetail.addToCart}</span>
-              </button>
+          <div className="pt-6 border-t border-white/10 space-y-4 mt-8 max-w-xl">
+            {/* Primary Purchase CTA Button (Full Width & Prominent) */}
+            <button
+              onClick={handleAddToCart}
+              className="w-full sm:w-auto min-w-[260px] py-4 px-8 rounded-2xl bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-navy-950 font-extrabold text-base sm:text-lg flex items-center justify-center gap-3 shadow-[0_12px_35px_-8px_rgba(201,168,76,0.5)] hover:shadow-[0_18px_45px_-8px_rgba(201,168,76,0.7)] hover:scale-[1.01] active:scale-98 transition-all duration-300"
+            >
+              <ShoppingCart weight="bold" className="w-5 h-5 shrink-0" />
+              <span>{t.bookDetail.addToCart}</span>
+            </button>
 
-              {book.book_file && (
-                <div className="flex items-center gap-2">
+            {/* Secondary Digital PDF Actions (Spacious & Distinct) */}
+            {book.book_file && (
+              <div className="p-4 rounded-2xl glass border border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-navy-900/60 backdrop-blur-xl">
+                <div className="flex items-center gap-2.5 text-xs sm:text-sm text-text-secondary font-medium">
+                  <div className="w-8 h-8 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
+                    <FilePdf weight="fill" className="w-4 h-4" />
+                  </div>
+                  <span>{language === "uz" ? "Raqamli PDF format tayyor:" : "Digital PDF available:"}</span>
+                </div>
+                <div className="flex items-center gap-2.5 shrink-0">
                   <button
                     type="button"
                     onClick={() => setIsPdfModalOpen(true)}
-                    className="btn-ghost text-sm flex items-center justify-center gap-2 border-gold-400/30 hover:border-gold-400 text-gold-300 hover:text-white transition-all shadow-sm"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 hover:border-red-500/50 text-red-300 hover:text-white transition-all text-xs sm:text-sm font-bold shadow-sm"
                   >
-                    <FilePdf weight="fill" className="w-4 h-4 text-red-400" />
+                    <FilePdf weight="fill" className="w-4 h-4 text-red-400 shrink-0" />
                     <span>{t.bookDetail.readPdf}</span>
                   </button>
                   <a
                     href={`/api/proxy-pdf?url=${encodeURIComponent(getImageUrl(book.book_file))}&download=1`}
-                    className="btn-ghost text-sm flex items-center justify-center gap-1.5 border-white/10 hover:border-gold-400/40 text-text-secondary hover:text-gold-300 transition-all shadow-sm px-3.5"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 hover:border-gold-400/50 text-text-primary hover:text-gold-300 transition-all text-xs sm:text-sm font-bold shadow-sm"
                     title={language === "uz" ? "Srazu yuklab olish" : "Instant Download"}
                   >
-                    <DownloadSimple weight="bold" className="w-4 h-4 text-gold-400" />
-                    <span className="hidden sm:inline">{language === "uz" ? "Yuklab olish" : "Download"}</span>
+                    <DownloadSimple weight="bold" className="w-4 h-4 text-gold-400 shrink-0" />
+                    <span>{language === "uz" ? "Yuklab olish" : "Download"}</span>
                   </a>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="text-xs text-text-muted">
               {book.stock > 0 ? (
@@ -392,18 +473,83 @@ export default function BookDetailPage({ params }: PageProps) {
                     review.user_detail?.first_name ||
                     review.user_detail?.email?.split("@")[0] ||
                     (language === "uz" ? "Kitobxon" : "Reader");
+                  const isAuthor =
+                    isAuthenticated &&
+                    user &&
+                    (review.user === user.id || review.user_detail?.id === user.id);
+
+                  if (editingReviewId === review.id) {
+                    return (
+                      <div
+                        key={review.id}
+                        className="glass p-6 rounded-2xl border border-gold-400/40 space-y-4 bg-navy-900/80 shadow-[0_0_25px_rgba(201,168,76,0.15)]"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-gold-400 flex items-center gap-2">
+                            <PencilSimple weight="bold" className="w-4 h-4" />
+                            <span>
+                              {language === "uz" ? "Izohni tahrirlash" : "Edit Review"}
+                            </span>
+                          </span>
+                          <div className="flex items-center gap-1 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setEditRating(star)}
+                                className="p-0.5 text-gold-400 hover:scale-125 transition-transform"
+                              >
+                                <Star
+                                  weight={star <= editRating ? "fill" : "regular"}
+                                  className="w-5 h-5"
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <textarea
+                          value={editComment}
+                          onChange={(e) => setEditComment(e.target.value)}
+                          rows={3}
+                          className="w-full bg-navy-950/80 border border-white/15 rounded-xl p-3.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-gold-400 transition-colors resize-none"
+                        />
+                        <div className="flex justify-end gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            disabled={updatingReview}
+                            className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-text-secondary transition-all"
+                          >
+                            {language === "uz" ? "Bekor qilish" : "Cancel"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateReview(review.id)}
+                            disabled={updatingReview || !editComment.trim()}
+                            className="btn-gold px-5 py-2 text-xs flex items-center gap-1.5 shadow-md"
+                          >
+                            {updatingReview && (
+                              <span className="w-3.5 h-3.5 rounded-full border-2 border-navy-950 border-t-transparent animate-spin" />
+                            )}
+                            <span>{language === "uz" ? "Saqlash" : "Save"}</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div
                       key={review.id}
                       className="glass p-6 rounded-2xl border border-white/5 space-y-3 transition-all duration-300 hover:border-white/15"
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-full bg-gold-400/10 border border-gold-400/20 flex items-center justify-center text-gold-400 font-bold text-sm shrink-0">
                             {reviewerName[0]?.toUpperCase() || "K"}
                           </div>
-                          <div>
-                            <h4 className="text-sm font-bold text-text-primary">
+                          <div className="min-w-0">
+                            <h4 className="text-sm font-bold text-text-primary truncate">
                               {reviewerName}
                             </h4>
                             <span className="text-[11px] text-text-muted font-mono">
@@ -415,14 +561,38 @@ export default function BookDetailPage({ params }: PageProps) {
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 bg-gold-400/10 px-2.5 py-1 rounded-full border border-gold-400/20">
-                          {[...Array(review.rating || 5)].map((_, idx) => (
-                            <Star
-                              key={idx}
-                              weight="fill"
-                              className="w-3.5 h-3.5 text-gold-400"
-                            />
-                          ))}
+
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div className="flex items-center gap-1 bg-gold-400/10 px-2.5 py-1 rounded-full border border-gold-400/20">
+                            {[...Array(review.rating || 5)].map((_, idx) => (
+                              <Star
+                                key={idx}
+                                weight="fill"
+                                className="w-3.5 h-3.5 text-gold-400"
+                              />
+                            ))}
+                          </div>
+
+                          {isAuthor && (
+                            <div className="flex items-center gap-1.5 pl-2 border-l border-white/10">
+                              <button
+                                type="button"
+                                onClick={() => handleStartEdit(review)}
+                                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-gold-400/20 text-text-secondary hover:text-gold-400 border border-transparent hover:border-gold-400/40 flex items-center justify-center transition-all shadow-sm"
+                                title={language === "uz" ? "Tahrirlash" : "Edit"}
+                              >
+                                <PencilSimple weight="bold" className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteReview(review.id)}
+                                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-red-500/20 text-text-secondary hover:text-red-400 border border-transparent hover:border-red-500/40 flex items-center justify-center transition-all shadow-sm"
+                                title={language === "uz" ? "O'chirish" : "Delete"}
+                              >
+                                <Trash weight="bold" className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <p className="text-sm text-text-secondary leading-relaxed sm:pl-13">

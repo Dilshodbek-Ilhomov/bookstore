@@ -179,6 +179,20 @@ export const reviewsAPI = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  update: (
+    id: number,
+    data: { rating?: number; comment?: string }
+  ): Promise<Review> =>
+    apiFetch(`/reviews/${id}/`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: number): Promise<void> =>
+    apiFetch(`/reviews/${id}/`, {
+      method: "DELETE",
+    }),
 };
 
 // ---- Orders API ----

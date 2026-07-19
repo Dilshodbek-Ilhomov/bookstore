@@ -17,20 +17,20 @@ interface BookCardProps {
 /** Renders 5 stars (filled / partial / empty) based on a 0–5 float rating */
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-[2px]" aria-label={`${rating} out of 5`}>
+    <div className="flex items-center gap-[1px] sm:gap-[2px]" aria-label={`${rating} out of 5`}>
       {[1, 2, 3, 4, 5].map((i) => {
         const fill = Math.min(1, Math.max(0, rating - (i - 1)));
         return (
-          <span key={i} className="relative inline-block w-3 h-3">
+          <span key={i} className="relative inline-block w-2.5 sm:w-3 h-2.5 sm:h-3">
             {/* Empty star background */}
-            <Star weight="regular" className="absolute inset-0 w-3 h-3 text-white/20" />
+            <Star weight="regular" className="absolute inset-0 w-2.5 sm:w-3 h-2.5 sm:h-3 text-white/20" />
             {/* Filled portion — clipped horizontally */}
             {fill > 0 && (
               <span
                 className="absolute inset-0 overflow-hidden"
                 style={{ width: `${fill * 100}%` }}
               >
-                <Star weight="fill" className="w-3 h-3 text-gold-400" />
+                <Star weight="fill" className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-gold-400" />
               </span>
             )}
           </span>
@@ -67,18 +67,18 @@ export function BookCard({ book }: BookCardProps) {
         willChange: "transform, opacity",
       }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative flex flex-col justify-between h-full rounded-3xl border border-white/10 bg-navy-900/75 p-4 transition-[transform,border-color,background-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-gold-400/40 hover:bg-navy-900 hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.12)] hover:-translate-y-1.5 overflow-hidden gpu-layer content-visibility-auto"
+      className="group relative flex flex-col justify-between h-full rounded-2xl sm:rounded-3xl border border-white/10 bg-navy-900/75 p-2.5 sm:p-4 transition-[transform,border-color,background-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-gold-400/40 hover:bg-navy-900 hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.12)] hover:-translate-y-1 sm:hover:-translate-y-1.5 overflow-hidden gpu-layer content-visibility-auto"
     >
       {/* Micro-Sheen Reflection */}
       <span className="sheen-overlay" aria-hidden="true" />
 
       {/* Cover image */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-navy-950 mb-4 ring-1 ring-white/5 transition-all duration-500 group-hover:ring-gold-400/20">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl sm:rounded-2xl bg-navy-950 mb-2.5 sm:mb-4 ring-1 ring-white/5 transition-all duration-500 group-hover:ring-gold-400/20">
         <Image
           src={getImageUrl(book.cover_image)}
           alt={getLocalizedBookTitle(book, language, t)}
           fill
-          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 select-none pointer-events-none"
           draggable={false}
           onDragStart={(e) => e.preventDefault()}
@@ -89,11 +89,11 @@ export function BookCard({ book }: BookCardProps) {
         <div className="absolute inset-0 bg-navy-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
           <button
             onClick={handleAddToCart}
-            className="group/btn relative h-12 w-12 overflow-hidden rounded-full bg-gradient-to-tr from-gold-400 to-gold-500 text-navy-950 flex items-center justify-center shadow-[0_10px_24px_-6px_rgba(201,168,76,0.6)] hover:scale-110 active:scale-95 transition-transform duration-300"
+            className="group/btn relative h-10 sm:h-12 w-10 sm:w-12 overflow-hidden rounded-full bg-gradient-to-tr from-gold-400 to-gold-500 text-navy-950 flex items-center justify-center shadow-[0_10px_24px_-6px_rgba(201,168,76,0.6)] hover:scale-110 active:scale-95 transition-transform duration-300"
             aria-label={t.bookCard.add}
           >
             <span className="sheen-overlay" aria-hidden="true" />
-            <ShoppingCart weight="bold" className="relative z-10 w-5 h-5" />
+            <ShoppingCart weight="bold" className="relative z-10 w-4 sm:w-5 h-4 sm:h-5" />
           </button>
         </div>
       </div>
@@ -101,12 +101,12 @@ export function BookCard({ book }: BookCardProps) {
       {/* Text content */}
       <Link href={`/books/${book.id}`} className="flex-1 flex flex-col z-10">
         {/* Title */}
-        <h3 className="text-base font-bold tracking-tight text-text-primary group-hover:text-gold-300 transition-colors duration-200 line-clamp-1 mb-0.5">
+        <h3 className="text-xs sm:text-base font-bold tracking-tight text-text-primary group-hover:text-gold-300 transition-colors duration-200 line-clamp-1 mb-0.5">
           {getLocalizedBookTitle(book, language, t)}
         </h3>
 
         {/* Author(s) */}
-        <p className="text-xs text-gold-400/80 font-medium mb-1 line-clamp-1">
+        <p className="text-[10px] sm:text-xs text-gold-400/80 font-medium mb-1 line-clamp-1">
           {book.authors_detail && book.authors_detail.length > 0
             ? book.authors_detail.map((a) => a.full_name).join(", ")
             : getLocalizedBookDesc(book, language, t)}
@@ -114,15 +114,15 @@ export function BookCard({ book }: BookCardProps) {
 
         {/* Category badge */}
         {book.category_detail && (
-          <span className="inline-flex self-start items-center rounded-full bg-white/[0.04] border border-white/5 px-2 py-0.5 text-[10px] font-mono text-text-muted mb-2 line-clamp-1">
+          <span className="inline-flex self-start items-center rounded-full bg-white/[0.04] border border-white/5 px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[10px] font-mono text-text-muted mb-1.5 sm:mb-2 line-clamp-1">
             {book.category_detail.name}
           </span>
         )}
 
         {/* Price + Rating */}
-        <div className="mt-auto flex items-center justify-between pt-3 border-t border-white/5">
+        <div className="mt-auto flex items-center justify-between pt-2 sm:pt-3 border-t border-white/5">
           {/* Price */}
-          <span className="text-base font-bold font-mono tracking-tight text-gold-400">
+          <span className="text-sm sm:text-base font-bold font-mono tracking-tight text-gold-400">
             {formatPrice(book.price, language)}
           </span>
 
@@ -130,18 +130,18 @@ export function BookCard({ book }: BookCardProps) {
           <div className="flex flex-col items-end gap-0.5">
             {hasRating ? (
               <>
-                <div className="flex items-center gap-1.5 rounded-full bg-white/[0.04] border border-white/5 px-2.5 py-1">
+                <div className="flex items-center gap-1 sm:gap-1.5 rounded-full bg-white/[0.04] border border-white/5 px-1.5 sm:px-2.5 py-0.5 sm:py-1">
                   <StarRating rating={displayRating} />
-                  <span className="text-xs font-bold font-mono text-gold-300 tabular-nums">
+                  <span className="text-[10px] sm:text-xs font-bold font-mono text-gold-300 tabular-nums">
                     {displayRating.toFixed(1)}
                   </span>
                 </div>
-                <span className="text-[9px] text-text-muted font-mono tabular-nums pr-1">
+                <span className="hidden sm:inline text-[9px] text-text-muted font-mono tabular-nums pr-1">
                   {reviewCount} {language === "uz" ? "sharh" : "reviews"}
                 </span>
               </>
             ) : (
-              <span className="rounded-full bg-navy-700/60 border border-white/5 px-2.5 py-1 text-[10px] font-mono text-text-muted tracking-wider">
+              <span className="rounded-full bg-navy-700/60 border border-white/5 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-mono text-text-muted tracking-wider">
                 {language === "uz" ? "Yangi" : "New"}
               </span>
             )}
