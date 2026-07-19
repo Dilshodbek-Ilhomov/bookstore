@@ -268,9 +268,9 @@ function BooksContent() {
         {/* Catalog Grid */}
         <div className="lg:col-span-3">
           {loading ? (
-            <div className="flex flex-wrap justify-center items-stretch gap-3 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6 items-stretch">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-1rem)] max-w-[340px] aspect-[3/4] rounded-2xl glass animate-pulse" />
+                <div key={i} className="w-full aspect-[3/4] rounded-2xl glass animate-pulse" />
               ))}
             </div>
           ) : displayedBooks.length === 0 ? (
@@ -278,11 +278,11 @@ function BooksContent() {
               <p className="text-sm">{t.booksPage.emptyTitle}</p>
             </div>
           ) : (
-            <div className="flex flex-wrap justify-center items-stretch gap-3 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6 items-stretch">
               {displayedBooks.map((book) => (
                 <div
                   key={book.id}
-                  className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-1rem)] max-w-[340px] flex flex-col"
+                  className="w-full flex flex-col h-full"
                 >
                   <BookCard book={book} />
                 </div>

@@ -119,32 +119,56 @@ export function BookCard({ book }: BookCardProps) {
           </span>
         )}
 
-        {/* Price + Rating */}
-        <div className="mt-auto flex items-center justify-between pt-2 sm:pt-3 border-t border-white/5">
-          {/* Price */}
-          <span className="text-sm sm:text-base font-bold font-mono tracking-tight text-gold-400">
-            {formatPrice(book.price, language)}
-          </span>
-
-          {/* Real rating pill */}
-          <div className="flex flex-col items-end gap-0.5">
-            {hasRating ? (
-              <>
-                <div className="flex items-center gap-1 sm:gap-1.5 rounded-full bg-white/[0.04] border border-white/5 px-1.5 sm:px-2.5 py-0.5 sm:py-1">
-                  <StarRating rating={displayRating} />
-                  <span className="text-[10px] sm:text-xs font-bold font-mono text-gold-300 tabular-nums">
-                    {displayRating.toFixed(1)}
-                  </span>
-                </div>
-                <span className="hidden sm:inline text-[9px] text-text-muted font-mono tabular-nums pr-1">
-                  {reviewCount} {language === "uz" ? "sharh" : "reviews"}
+        {/* Price + Rating + Mobile Quick Cart */}
+        <div className="mt-auto pt-2 sm:pt-3 border-t border-white/5 flex items-center justify-between gap-1">
+          <div className="flex flex-col">
+            <span className="text-xs sm:text-base font-bold font-mono tracking-tight text-gold-400">
+              {formatPrice(book.price, language)}
+            </span>
+            <div className="flex items-center gap-1 sm:hidden">
+              {hasRating ? (
+                <span className="text-[9px] font-bold font-mono text-gold-300 flex items-center gap-0.5">
+                  ★ {displayRating.toFixed(1)}
                 </span>
-              </>
-            ) : (
-              <span className="rounded-full bg-navy-700/60 border border-white/5 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-mono text-text-muted tracking-wider">
-                {language === "uz" ? "Yangi" : "New"}
-              </span>
-            )}
+              ) : (
+                <span className="text-[8px] font-mono text-text-muted">
+                  {language === "uz" ? "Yangi" : "New"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            {/* Real rating pill for Desktop */}
+            <div className="hidden sm:flex flex-col items-end gap-0.5">
+              {hasRating ? (
+                <>
+                  <div className="flex items-center gap-1.5 rounded-full bg-white/[0.04] border border-white/5 px-2.5 py-1">
+                    <StarRating rating={displayRating} />
+                    <span className="text-xs font-bold font-mono text-gold-300 tabular-nums">
+                      {displayRating.toFixed(1)}
+                    </span>
+                  </div>
+                  <span className="text-[9px] text-text-muted font-mono tabular-nums pr-1">
+                    {reviewCount} {language === "uz" ? "sharh" : "reviews"}
+                  </span>
+                </>
+              ) : (
+                <span className="rounded-full bg-navy-700/60 border border-white/5 px-2.5 py-1 text-[10px] font-mono text-text-muted tracking-wider">
+                  {language === "uz" ? "Yangi" : "New"}
+                </span>
+              )}
+            </div>
+
+            {/* Mobile Quick Add-to-Cart Button (Always accessible without hover on touchscreen) */}
+            <button
+              onClick={handleAddToCart}
+              className="sm:hidden h-7 w-7 rounded-xl bg-gold-400/15 hover:bg-gold-400 border border-gold-400/30 hover:border-gold-400 text-gold-400 hover:text-navy-950 flex items-center justify-center transition-all active:scale-90 shadow-sm shrink-0"
+              title={t.bookCard.add}
+              aria-label={t.bookCard.add}
+            >
+              <ShoppingCart weight="bold" className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </Link>
