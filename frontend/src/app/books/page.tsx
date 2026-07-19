@@ -143,7 +143,7 @@ function BooksContent() {
 
       {/* Category exploration view when clicked from navbar/footer */}
       {activeView === "categories" && (
-        <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="mb-12 flex flex-wrap justify-center items-stretch gap-4">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -151,13 +151,13 @@ function BooksContent() {
                 updateFilters("category", String(cat.id));
                 updateFilters("view", null);
               }}
-              className={`p-5 rounded-2xl border text-left transition-all ${
+              className={`w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(25%-0.75rem)] min-w-[240px] flex flex-col justify-between p-5 rounded-2xl border text-left transition-all ${
                 activeCategory === String(cat.id)
                   ? "bg-gold-400/15 border-gold-400 text-gold-400 shadow-[0_0_20px_rgba(201,168,76,0.2)]"
                   : "glass hover:border-gold-400/40 text-text-primary"
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-2 w-full">
                 <span className="font-bold text-base">{getLocalizedCategoryName(cat, language, t)}</span>
                 {typeof cat.book_count === "number" && (
                   <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 font-mono text-gold-400">
