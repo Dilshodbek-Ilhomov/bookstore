@@ -58,12 +58,14 @@ export function getStars(rating: number): ("full" | "half" | "empty")[] {
 
 /**
  * Get full image URL from API path
+ * - If already absolute (http/https), return as-is
+ * - Otherwise prepend the media origin (api.book-store.uz in prod)
  */
 export function getImageUrl(path: string | null): string {
   if (!path) return "/placeholder-book.svg";
   if (path.startsWith("http")) return path;
-  const base = process.env.NEXT_PUBLIC_API_URL || "https://book-store.uz";
-  // Remove /api from base if present
+  // Fallback origin: use env var or the production API subdomain
+  const base = process.env.NEXT_PUBLIC_API_URL || "https://api.book-store.uz/api";
   const origin = base.replace(/\/api$/, "");
   return `${origin}${path.startsWith("/") ? "" : "/"}${path}`;
 }
