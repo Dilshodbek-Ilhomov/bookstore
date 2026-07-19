@@ -90,9 +90,6 @@ export function CartDrawer() {
                       </span>
                     )}
                   </h2>
-                  <p className="text-[11px] font-mono text-text-muted uppercase tracking-wider">
-                    {language === "uz" ? "Futuristik Savat" : "Futuristic Cart"}
-                  </p>
                 </div>
               </div>
 
@@ -114,7 +111,6 @@ export function CartDrawer() {
                   className="h-full flex flex-col items-center justify-center text-center text-text-secondary space-y-4 px-6 py-12"
                 >
                   <div className="w-20 h-20 rounded-3xl bg-white/[0.02] border border-white/5 flex items-center justify-center shadow-inner relative">
-                    <Sparkle weight="thin" className="w-10 h-10 text-gold-400/40 animate-spin-slow absolute" />
                     <ShoppingBag weight="thin" className="w-10 h-10 text-gold-400/60" />
                   </div>
                   <div className="space-y-1">
@@ -123,8 +119,8 @@ export function CartDrawer() {
                     </h3>
                     <p className="text-xs text-text-muted max-w-[220px]">
                       {language === "uz"
-                        ? "Kitoblarni tanlang va u bilan kelajagingizni yoriting."
-                        : "Pick your favorite books to light up your future."}
+                        ? "Kitoblarni tanlab, savatingizni to'ldiring."
+                        : "Select books to fill your cart."}
                     </p>
                   </div>
                 </motion.div>

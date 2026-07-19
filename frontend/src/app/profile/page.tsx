@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { ordersAPI } from "@/lib/api";
 import type { Order } from "@/types";
-import { formatDate, formatPrice } from "@/lib/utils";
-import { User, SignOut, Receipt, BookOpen, BellRinging, CheckCircle, XCircle, Clock, ArrowsClockwise } from "@phosphor-icons/react";
+import { formatDate, formatPrice, getImageUrl } from "@/lib/utils";
+import { User, SignOut, Receipt, BookOpen, BellRinging, CheckCircle, XCircle, Clock, ArrowsClockwise, FilePdf } from "@phosphor-icons/react";
+import Link from "next/link";
 import { useLanguageStore } from "@/store/languageStore";
 import { getLocalizedBookTitle } from "@/lib/i18n";
 
@@ -151,8 +152,21 @@ export default function ProfilePage() {
                     {language === "uz" ? `Buyurtma #${statusAlert.id} holati yangilandi!` : `Order #${statusAlert.id} status updated!`}
                   </span>{" "}
                   <span className="text-text-secondary">
-                    ({statusAlert.prev.toUpperCase()} →{" "}
-                    <strong className="text-white font-semibold">{statusAlert.next.toUpperCase()}</strong>)
+                    (
+                    {statusAlert.prev === "completed"
+                      ? t.profilePage.statusCompleted
+                      : statusAlert.prev === "cancelled"
+                        ? t.profilePage.statusCancelled
+                        : t.profilePage.statusPending}{" "}
+                    →{" "}
+                    <strong className="text-white font-semibold">
+                      {statusAlert.next === "completed"
+                        ? t.profilePage.statusCompleted
+                        : statusAlert.next === "cancelled"
+                          ? t.profilePage.statusCancelled
+                          : t.profilePage.statusPending}
+                    </strong>
+                    )
                   </span>
                 </div>
               </div>
@@ -202,15 +216,40 @@ export default function ProfilePage() {
                       <p className="text-xs text-text-secondary">
                         {t.profilePage.dateLabel} {formatDate(order.created_at, language)}
                       </p>
-                      <div className="flex flex-wrap gap-2 mt-2">
+                      <div className="flex flex-wrap gap-2.5 mt-2">
                         {order.items?.map((item) => (
-                          <span
+                          <div
                             key={item.id}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy-900 border border-white/5 text-[11px] text-text-secondary"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-navy-900 border border-white/10 text-xs text-text-primary shadow-sm"
                           >
-                            <BookOpen className="w-3.5 h-3.5 text-gold-400/60" />
-                            {item.book ? getLocalizedBookTitle(item.book, language, t) : ""} x {item.quantity}
-                          </span>
+                            <BookOpen className="w-4 h-4 text-gold-400 shrink-0" />
+                            {item.book ? (
+                              <Link
+                                href={`/books/${item.book.id}`}
+                                className="font-medium hover:text-gold-300 transition-colors"
+                              >
+                                {getLocalizedBookTitle(item.book, language, t)}
+                              </Link>
+                            ) : (
+                              <span>Kitob</span>
+                            )}
+                            <span className="text-text-muted font-mono text-[11px]">x{item.quantity}</span>
+
+                            {order.status === "completed" && item.book?.book_file && (
+                              <a
+                                href={getImageUrl(item.book.book_file)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ml-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 hover:border-red-500/50 hover:text-red-300 transition-all font-semibold shadow-sm"
+                                title={language === "uz" ? "PDF O'qish" : "Read PDF"}
+                              >
+                                <FilePdf weight="fill" className="w-4 h-4 shrink-0" />
+                                <span className="text-[11px] font-mono uppercase tracking-wider">
+                                  {language === "uz" ? "PDF O'qish" : "Read PDF"}
+                                </span>
+                              </a>
+                            )}
+                          </div>
                         ))}
                       </div>
                     </div>
