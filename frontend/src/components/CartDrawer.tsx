@@ -144,7 +144,9 @@ export function CartDrawer() {
                           src={getImageUrl(item.book.cover_image)}
                           alt={getLocalizedBookTitle(item.book, language, t)}
                           fill
-                          className="object-cover"
+                          className="object-cover select-none pointer-events-none"
+                          draggable={false}
+                          onDragStart={(e) => e.preventDefault()}
                         />
                       </div>
 

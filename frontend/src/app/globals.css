@@ -47,6 +47,19 @@ body {
   overflow-x: hidden;
 }
 
+/* ---- Disable Image Drag & Selection across the platform ---- */
+img,
+svg {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 /* ---- Selection ---- */
 ::selection {
   background-color: rgba(201, 168, 76, 0.3);

@@ -165,7 +165,13 @@ export function HeroSection({ books = [], loading = false }: HeroSectionProps = 
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-16 rounded-lg bg-gradient-to-br from-gold-400/20 to-navy-800 flex items-center justify-center border border-gold-400/20 shrink-0 overflow-hidden relative">
                         {topBook?.cover_image ? (
-                          <img src={topBook.cover_image} alt={topBook.title} className="w-full h-full object-cover" />
+                          <img
+                            src={topBook.cover_image}
+                            alt={topBook.title}
+                            className="w-full h-full object-cover select-none pointer-events-none"
+                            draggable={false}
+                            onDragStart={(e) => e.preventDefault()}
+                          />
                         ) : (
                           <BookOpen weight="thin" className="w-6 h-6 text-gold-400" />
                         )}

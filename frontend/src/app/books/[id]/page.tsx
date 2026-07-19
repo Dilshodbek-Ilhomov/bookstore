@@ -163,7 +163,9 @@ export default function BookDetailPage({ params }: PageProps) {
                 alt={book.title}
                 fill
                 priority
-                className="object-cover"
+                className="object-cover select-none pointer-events-none"
+                draggable={false}
+                onDragStart={(e) => e.preventDefault()}
               />
             </div>
           </div>
