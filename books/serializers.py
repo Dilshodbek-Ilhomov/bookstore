@@ -16,6 +16,9 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
+    # Nested read representations
+    category_detail = CategorySerializer(source='category', read_only=True)
+    authors_detail = AuthorSerializer(source='authors', many=True, read_only=True)
 
     def validate_book_file(self, value):
         # 50 MB limit
@@ -55,4 +58,17 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = "__all__"
+        fields = [
+            'id',
+            'cover_image',
+            'book_file',
+            'title',
+            'description',
+            'price',
+            'stock',
+            'category',
+            'category_detail',
+            'authors',
+            'authors_detail',
+            'created_at',
+        ]

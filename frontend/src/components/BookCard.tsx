@@ -63,12 +63,21 @@ export function BookCard({ book }: BookCardProps) {
 
       {/* Book details */}
       <Link href={`/books/${book.id}`} className="flex-1 flex flex-col z-10">
-        <h3 className="text-base font-bold tracking-tight text-text-primary group-hover:text-gold-300 transition-colors duration-200 line-clamp-1 mb-1">
+        <h3 className="text-base font-bold tracking-tight text-text-primary group-hover:text-gold-300 transition-colors duration-200 line-clamp-1 mb-0.5">
           {getLocalizedBookTitle(book, language, t)}
         </h3>
-        <p className="text-xs text-text-secondary mb-3 line-clamp-1">
-          {getLocalizedBookDesc(book, language, t)}
+        {/* Author name from nested authors_detail */}
+        <p className="text-xs text-gold-400/80 font-medium mb-1 line-clamp-1">
+          {book.authors_detail && book.authors_detail.length > 0
+            ? book.authors_detail.map((a) => a.full_name).join(", ")
+            : getLocalizedBookDesc(book, language, t)}
         </p>
+        {/* Category badge */}
+        {book.category_detail && (
+          <span className="inline-flex self-start items-center rounded-full bg-white/[0.04] border border-white/5 px-2 py-0.5 text-[10px] font-mono text-text-muted mb-2 line-clamp-1">
+            {book.category_detail.name}
+          </span>
+        )}
         
         {/* Rating and Price */}
         <div className="mt-auto flex items-center justify-between pt-3 border-t border-white/5">

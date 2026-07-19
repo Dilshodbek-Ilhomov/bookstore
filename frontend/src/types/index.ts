@@ -21,13 +21,17 @@ export interface Book {
   price: string; // DecimalField returns string
   stock: number;
   category: number;
+  category_detail?: Category;       // Nested category object from API
   authors: number[];
+  authors_detail?: Author[];        // Nested authors array from API
   created_at: string;
 }
 
 export interface BookDetail extends Omit<Book, "category" | "authors"> {
   category: Category;
   authors: Author[];
+  category_detail?: Category;
+  authors_detail?: Author[];
 }
 
 export interface Review {
