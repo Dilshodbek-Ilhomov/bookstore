@@ -7,6 +7,7 @@ interface ScrollRevealProps {
   delay?: number;
   direction?: "up" | "down" | "left" | "right" | "none";
   duration?: number;
+  className?: string;
 }
 
 export function ScrollReveal({
@@ -14,11 +15,12 @@ export function ScrollReveal({
   delay = 0,
   direction = "up",
   duration = 0.5,
+  className = "",
 }: ScrollRevealProps) {
   const reduce = useReducedMotion();
 
   if (reduce) {
-    return <>{children}</>;
+    return <div className={className}>{children}</div>;
   }
 
   const getDirectionOffset = () => {
@@ -38,6 +40,7 @@ export function ScrollReveal({
 
   return (
     <motion.div
+      className={className}
       initial={{ opacity: 0, ...getDirectionOffset() }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: true, margin: "-20px" }}

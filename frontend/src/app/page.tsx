@@ -6,7 +6,21 @@ import { BookCard } from "@/components/BookCard";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { booksAPI, categoriesAPI } from "@/lib/api";
 import type { Book, Category } from "@/types";
-import { ArrowRight, BookOpen, Fire, Trophy, Truck, Star } from "@phosphor-icons/react";
+import {
+  ArrowRight,
+  BookOpen,
+  Fire,
+  Trophy,
+  Truck,
+  Star,
+  Code,
+  Atom,
+  TrendUp,
+  Hourglass,
+  Brain,
+  Sparkle,
+  Crown,
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import { useLanguageStore } from "@/store/languageStore";
 import { getLocalizedCategoryName } from "@/lib/i18n";
@@ -86,6 +100,98 @@ export default function Home() {
     return { title, desc };
   };
 
+  // Custom high-end visual styles and Phosphor icons for each category
+  const getCategoryTheme = (cat: Category, index: number) => {
+    const nameLower = (cat.name || "").toLowerCase();
+    if (nameLower.includes("programming") || nameLower.includes("dasturlash") || nameLower.includes("code")) {
+      return {
+        icon: <Code weight="bold" className="w-8 h-8 text-cyan-400 group-hover:scale-110 transition-transform duration-500" />,
+        bgCard: "bg-gradient-to-br from-cyan-500/[0.12] via-navy-900/95 to-navy-950 border-cyan-500/30 hover:border-cyan-400/80 shadow-[0_15px_35px_-12px_rgba(6,182,212,0.25)] hover:shadow-[0_20px_45px_-10px_rgba(6,182,212,0.4)]",
+        badge: "bg-cyan-400/10 border-cyan-400/30 text-cyan-300",
+        glow: "bg-cyan-500/15",
+        iconBox: "bg-cyan-400/10 border-cyan-400/30",
+        accentText: "group-hover:text-cyan-300",
+      };
+    }
+    if (nameLower.includes("science") || nameLower.includes("ilmiy") || nameLower.includes("adabiyot")) {
+      return {
+        icon: <Atom weight="bold" className="w-8 h-8 text-purple-400 group-hover:scale-110 transition-transform duration-500" />,
+        bgCard: "bg-gradient-to-br from-purple-500/[0.12] via-navy-900/95 to-navy-950 border-purple-500/30 hover:border-purple-400/80 shadow-[0_15px_35px_-12px_rgba(168,85,247,0.25)] hover:shadow-[0_20px_45px_-10px_rgba(168,85,247,0.4)]",
+        badge: "bg-purple-400/10 border-purple-400/30 text-purple-300",
+        glow: "bg-purple-500/15",
+        iconBox: "bg-purple-400/10 border-purple-400/30",
+        accentText: "group-hover:text-purple-300",
+      };
+    }
+    if (nameLower.includes("business") || nameLower.includes("biznes") || nameLower.includes("iqtisod")) {
+      return {
+        icon: <TrendUp weight="bold" className="w-8 h-8 text-emerald-400 group-hover:scale-110 transition-transform duration-500" />,
+        bgCard: "bg-gradient-to-br from-emerald-500/[0.12] via-navy-900/95 to-navy-950 border-emerald-500/30 hover:border-emerald-400/80 shadow-[0_15px_35px_-12px_rgba(16,185,129,0.25)] hover:shadow-[0_20px_45px_-10px_rgba(16,185,129,0.4)]",
+        badge: "bg-emerald-400/10 border-emerald-400/30 text-emerald-300",
+        glow: "bg-emerald-500/15",
+        iconBox: "bg-emerald-400/10 border-emerald-400/30",
+        accentText: "group-hover:text-emerald-300",
+      };
+    }
+    if (nameLower.includes("history") || nameLower.includes("tarix") || nameLower.includes("tarixiy")) {
+      return {
+        icon: <Hourglass weight="bold" className="w-8 h-8 text-amber-400 group-hover:scale-110 transition-transform duration-500" />,
+        bgCard: "bg-gradient-to-br from-amber-500/[0.12] via-navy-900/95 to-navy-950 border-amber-500/30 hover:border-amber-400/80 shadow-[0_15px_35px_-12px_rgba(245,158,11,0.25)] hover:shadow-[0_20px_45px_-10px_rgba(245,158,11,0.4)]",
+        badge: "bg-amber-400/10 border-amber-400/30 text-amber-300",
+        glow: "bg-amber-500/15",
+        iconBox: "bg-amber-400/10 border-amber-400/30",
+        accentText: "group-hover:text-amber-300",
+      };
+    }
+    if (nameLower.includes("psychology") || nameLower.includes("psixologiya") || nameLower.includes("shaxsiy") || nameLower.includes("rivojlanish")) {
+      return {
+        icon: <Brain weight="bold" className="w-8 h-8 text-rose-400 group-hover:scale-110 transition-transform duration-500" />,
+        bgCard: "bg-gradient-to-br from-rose-500/[0.12] via-navy-900/95 to-navy-950 border-rose-500/30 hover:border-rose-400/80 shadow-[0_15px_35px_-12px_rgba(244,63,94,0.25)] hover:shadow-[0_20px_45px_-10px_rgba(244,63,94,0.4)]",
+        badge: "bg-rose-400/10 border-rose-400/30 text-rose-300",
+        glow: "bg-rose-500/15",
+        iconBox: "bg-rose-400/10 border-rose-400/30",
+        accentText: "group-hover:text-rose-300",
+      };
+    }
+    const fallbacks = [
+      {
+        icon: <BookOpen weight="bold" className="w-8 h-8 text-gold-400 group-hover:scale-110 transition-transform duration-500" />,
+        bgCard: "bg-gradient-to-br from-gold-400/[0.12] via-navy-900/95 to-navy-950 border-gold-400/30 hover:border-gold-400/80 shadow-[0_15px_35px_-12px_rgba(201,168,76,0.25)]",
+        badge: "bg-gold-400/10 border-gold-400/30 text-gold-300",
+        glow: "bg-gold-500/15",
+        iconBox: "bg-gold-400/10 border-gold-400/30",
+        accentText: "group-hover:text-gold-300",
+      },
+      {
+        icon: <Sparkle weight="bold" className="w-8 h-8 text-cyan-400 group-hover:scale-110 transition-transform duration-500" />,
+        bgCard: "bg-gradient-to-br from-cyan-400/[0.12] via-navy-900/95 to-navy-950 border-cyan-400/30 hover:border-cyan-400/80 shadow-[0_15px_35px_-12px_rgba(6,182,212,0.25)]",
+        badge: "bg-cyan-400/10 border-cyan-400/30 text-cyan-300",
+        glow: "bg-cyan-500/15",
+        iconBox: "bg-cyan-400/10 border-cyan-400/30",
+        accentText: "group-hover:text-cyan-300",
+      },
+    ];
+    return fallbacks[index % fallbacks.length];
+  };
+
+  // Dynamic gapless 6-column bento span layout (ensures rows fill up perfectly without blank spots)
+  const getBentoSpan = (idx: number, total: number) => {
+    if (total === 5) {
+      // Top row: 2 large feature cards (3 + 3 = 6 cols)
+      // Bottom row: 3 equal cards (2 + 2 + 2 = 6 cols)
+      if (idx === 0 || idx === 1) return "md:col-span-3 min-h-[300px] sm:min-h-[330px]";
+      return "md:col-span-2 min-h-[270px] sm:min-h-[300px]";
+    }
+    if (total === 6) {
+      return "md:col-span-2 min-h-[280px] sm:min-h-[310px]";
+    }
+    if (total === 4) {
+      return "md:col-span-3 min-h-[300px] sm:min-h-[330px]";
+    }
+    const pattern = ["md:col-span-3", "md:col-span-3", "md:col-span-2", "md:col-span-2", "md:col-span-2"];
+    return (pattern[idx % pattern.length] || "md:col-span-2") + " min-h-[280px] sm:min-h-[310px]";
+  };
+
   return (
     <div className="relative pb-24">
       <HeroSection books={books} loading={loading} />
@@ -108,64 +214,96 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {books.map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
+            {loading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="aspect-[3/4] rounded-3xl bg-navy-900/60 animate-pulse border border-white/5"
+                  />
+                ))
+              : books
+                  .slice(0, 5)
+                  .map((book) => <BookCard key={book.id} book={book} />)}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/books"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-navy-900/80 border border-white/10 hover:border-gold-400/40 text-sm font-semibold text-text-primary hover:text-gold-300 transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.2)]"
+            >
+              {t.featured.allBooks} <ArrowRight weight="bold" className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Bento categories grid (TasteSkill Asymmetric Layout) */}
+      {/* Bento categories grid (TasteSkill / UI-UX Pro Max Gapless Creative Layout) */}
       <section id="categories" className="section-spacing relative z-10">
         <div className="section-container">
           <div className="max-w-2xl mb-14">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text-primary mb-4">
-              {t.categories.title}
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text-primary mb-4 flex items-center gap-3.5">
+              <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-400/20 to-navy-900 border border-gold-400/30 shrink-0">
+                <Sparkle weight="fill" className="w-6 h-6 text-gold-400" />
+              </span>
+              <span>{t.categories.title}</span>
             </h2>
-            <p className="text-text-secondary text-base leading-relaxed">
+            <p className="text-text-secondary text-base sm:text-lg leading-relaxed">
               {t.categories.subtitle}
             </p>
           </div>
 
-          {/* Asymmetric Bento layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Gapless 6-column Dynamic Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-6 sm:gap-7">
             {categories.map((category, index) => {
-              const bentoClasses = [
-                "md:col-span-2 bg-gradient-to-br from-gold-400/[0.08] via-navy-900/90 to-navy-950",
-                "md:col-span-1 bg-gradient-to-br from-navy-900/90 to-navy-950",
-                "md:col-span-1 bg-gradient-to-br from-navy-900/90 to-navy-950",
-                "md:col-span-2 bg-gradient-to-r from-navy-900/90 via-gold-400/[0.06] to-navy-950",
-              ];
+              const theme = getCategoryTheme(category, index);
               const details = getCategoryDetails(category);
+              const spanClass = getBentoSpan(index, categories.length);
+
               return (
-                <ScrollReveal key={category.id} delay={index * 0.1}>
+                <ScrollReveal key={category.id || index} delay={index * 0.08} className={spanClass}>
                   <Link
                     href={`/books?category=${category.id}`}
-                    className={`group relative flex flex-col justify-between h-64 sm:h-72 p-8 sm:p-10 rounded-3xl border border-white/10 ${bentoClasses[index % bentoClasses.length]} shadow-[0_20px_40px_-16px_rgba(0,0,0,0.65)] backdrop-blur-xl transition-all duration-500 hover:border-gold-400/40 hover:-translate-y-1 hover:shadow-[0_28px_56px_-16px_rgba(0,0,0,0.8)] overflow-hidden`}
+                    className={`group relative flex flex-col justify-between h-full p-7 sm:p-9 rounded-3xl border ${theme.bgCard} backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 overflow-hidden`}
                   >
+                    {/* Micro-sheen reflection overlay */}
                     <span className="sheen-overlay" aria-hidden="true" />
-                    
-                    <div className="flex items-start justify-between">
-                      <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:border-gold-400/40">
-                        <BookOpen weight="thin" className="w-7 h-7 text-gold-400" />
+
+                    {/* Ambient background glow radial */}
+                    <div
+                      className={`absolute -top-20 -right-20 w-56 h-56 rounded-full blur-[65px] ${theme.glow} opacity-60 group-hover:opacity-100 transition-all duration-700 pointer-events-none`}
+                    />
+
+                    {/* Card Header: Icon & Badges */}
+                    <div className="relative z-10 flex items-start justify-between gap-4 mb-8">
+                      <div
+                        className={`w-16 h-16 rounded-2xl flex items-center justify-center border transition-all duration-500 group-hover:scale-110 shadow-lg ${theme.iconBox}`}
+                      >
+                        {theme.icon}
                       </div>
-                      <div className="flex items-center gap-2">
+
+                      <div className="flex flex-wrap items-center justify-end gap-2">
                         {typeof category.book_count === "number" && (
-                          <span className="inline-flex items-center rounded-full bg-gold-400/10 border border-gold-400/20 px-2.5 py-0.5 text-[11px] font-mono font-semibold text-gold-300">
+                          <span
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-mono font-bold tracking-wide border shadow-sm ${theme.badge}`}
+                          >
                             {category.book_count} {language === "uz" ? "kitob" : "books"}
                           </span>
                         )}
-                        <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.04] border border-white/5 px-3 py-1 text-xs font-mono text-text-muted group-hover:text-gold-300 transition-colors">
-                          {t.categories.explore} →
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] border border-white/10 px-3.5 py-1 text-xs font-mono text-text-muted group-hover:text-white group-hover:border-white/20 transition-all">
+                          <span>{t.categories.explore}</span>
+                          <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                         </span>
                       </div>
                     </div>
 
-                    <div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-text-primary group-hover:text-gold-300 transition-colors mb-2">
+                    {/* Card Body: Title & Description */}
+                    <div className="relative z-10">
+                      <h3
+                        className={`text-2xl sm:text-3xl font-extrabold tracking-tight text-text-primary ${theme.accentText} transition-colors duration-300 mb-3`}
+                      >
                         {details.title}
                       </h3>
-                      <p className="text-sm text-text-secondary max-w-md line-clamp-2">
+                      <p className="text-sm sm:text-base text-text-secondary/90 leading-relaxed max-w-xl line-clamp-3 group-hover:text-text-primary/95 transition-colors duration-300">
                         {details.desc}
                       </p>
                     </div>
