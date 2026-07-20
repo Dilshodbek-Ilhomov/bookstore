@@ -108,11 +108,11 @@ export function GlassNavbar() {
             <button
               onClick={toggleCart}
               aria-label={t.nav.cart}
-              className="group relative inline-flex h-8 items-center gap-2 overflow-hidden rounded-full bg-white/[0.04] px-3 text-sm font-medium text-text-primary ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-px hover:bg-white/[0.08] hover:text-gold-400 active:scale-[0.98]"
+              className="group relative inline-flex h-8 items-center gap-2 overflow-hidden rounded-full bg-white/[0.05] backdrop-blur-md saturate-150 px-3 text-sm font-medium text-text-primary ring-1 ring-white/15 transition-all duration-300 hover:-translate-y-px hover:bg-white/[0.1] hover:text-gold-400 active:scale-[0.98]"
             >
               <span className="sheen-overlay" aria-hidden="true" />
-              <ShoppingBag weight="bold" className="w-4 h-4 text-gold-400" />
-              <span className="font-mono text-xs font-semibold tabular-nums">
+              <ShoppingBag weight="bold" className="w-4 h-4 text-gold-400 relative z-10" />
+              <span className="font-mono text-xs font-semibold tabular-nums relative z-10">
                 {totalItems()}
               </span>
             </button>
@@ -121,16 +121,16 @@ export function GlassNavbar() {
             {isAuthenticated ? (
               <Link
                 href="/profile"
-                className="group relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white/[0.04] text-text-secondary ring-1 ring-white/10 transition-all duration-300 hover:-translate-y-px hover:text-gold-400 active:scale-[0.98]"
+                className="group relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white/[0.05] backdrop-blur-md text-text-secondary ring-1 ring-white/15 transition-all duration-300 hover:-translate-y-px hover:text-gold-400 active:scale-[0.98]"
                 aria-label={t.nav.profile}
               >
                 <span className="sheen-overlay" aria-hidden="true" />
-                <User weight="bold" className="w-4 h-4" />
+                <User weight="bold" className="w-4 h-4 relative z-10" />
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="group/btn relative hidden sm:inline-flex h-8 items-center gap-1.5 overflow-hidden rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-4 text-xs font-semibold text-navy-950 shadow-[0_6px_16px_-6px_rgba(201,168,76,0.5)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_10px_22px_-6px_rgba(201,168,76,0.7)] active:scale-[0.98]"
+                className="group/btn relative hidden sm:inline-flex h-8 items-center gap-1.5 overflow-hidden rounded-full bg-gradient-to-r from-gold-400 to-gold-500 px-4 text-xs font-semibold text-navy-950 border border-white/25 backdrop-blur-md shadow-[0_6px_16px_-6px_rgba(201,168,76,0.5)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_10px_22px_-6px_rgba(201,168,76,0.7)] active:scale-[0.98]"
               >
                 <span className="sheen-overlay" aria-hidden="true" />
                 <span className="relative z-10">{t.nav.login}</span>

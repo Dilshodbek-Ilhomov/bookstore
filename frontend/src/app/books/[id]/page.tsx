@@ -278,16 +278,17 @@ export default function BookDetailPage({ params }: PageProps) {
           </div>
 
           <div className="pt-6 border-t border-white/10 space-y-4 mt-8 max-w-xl">
-            {/* Primary Purchase CTA Button (Full Width & Prominent) */}
+            {/* Primary Purchase CTA Button (Full Width & Prominent with Apple Liquid Glass Gold) */}
             <button
               onClick={handleAddToCart}
-              className="w-full sm:w-auto min-w-[260px] py-4 px-8 rounded-2xl bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-navy-950 font-extrabold text-base sm:text-lg flex items-center justify-center gap-3 shadow-[0_12px_35px_-8px_rgba(201,168,76,0.5)] hover:shadow-[0_18px_45px_-8px_rgba(201,168,76,0.7)] hover:scale-[1.01] active:scale-98 transition-all duration-300"
+              className="group/btn relative overflow-hidden w-full sm:w-auto min-w-[260px] py-4 px-8 rounded-2xl bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-navy-950 font-extrabold text-base sm:text-lg flex items-center justify-center gap-3 border border-white/25 backdrop-blur-md shadow-[0_12px_35px_-8px_rgba(201,168,76,0.5)] hover:shadow-[0_18px_45px_-8px_rgba(201,168,76,0.7)] hover:scale-[1.01] active:scale-98 transition-all duration-300"
             >
-              <ShoppingCart weight="bold" className="w-5 h-5 shrink-0" />
-              <span>{t.bookDetail.addToCart}</span>
+              <span className="sheen-overlay" aria-hidden="true" />
+              <ShoppingCart weight="bold" className="w-5 h-5 shrink-0 relative z-10" />
+              <span className="relative z-10">{t.bookDetail.addToCart}</span>
             </button>
 
-            {/* Secondary Digital PDF Actions (Spacious & Distinct) */}
+            {/* Secondary Digital PDF Actions (Spacious & Distinct with Liquid Glass) */}
             {book.book_file && (
               <div className="p-4 rounded-2xl glass border border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-navy-900/60 backdrop-blur-xl">
                 <div className="flex items-center gap-2.5 text-xs sm:text-sm text-text-secondary font-medium">
@@ -300,18 +301,20 @@ export default function BookDetailPage({ params }: PageProps) {
                   <button
                     type="button"
                     onClick={() => setIsPdfModalOpen(true)}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 hover:border-red-500/50 text-red-300 hover:text-white transition-all text-xs sm:text-sm font-bold shadow-sm"
+                    className="group relative overflow-hidden flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 hover:border-red-500/50 text-red-300 hover:text-white backdrop-blur-md transition-all text-xs sm:text-sm font-bold shadow-sm active:scale-95"
                   >
-                    <FilePdf weight="fill" className="w-4 h-4 text-red-400 shrink-0" />
-                    <span>{t.bookDetail.readPdf}</span>
+                    <span className="sheen-overlay" aria-hidden="true" />
+                    <FilePdf weight="fill" className="w-4 h-4 text-red-400 shrink-0 relative z-10" />
+                    <span className="relative z-10">{t.bookDetail.readPdf}</span>
                   </button>
                   <a
                     href={`/api/proxy-pdf?url=${encodeURIComponent(getImageUrl(book.book_file))}&download=1`}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 hover:border-gold-400/50 text-text-primary hover:text-gold-300 transition-all text-xs sm:text-sm font-bold shadow-sm"
+                    className="group relative overflow-hidden inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-gold-400/20 border border-white/15 hover:border-gold-400/50 text-text-primary hover:text-gold-300 backdrop-blur-md transition-all text-xs sm:text-sm font-bold shadow-sm active:scale-95"
                     title={language === "uz" ? "Srazu yuklab olish" : "Instant Download"}
                   >
-                    <DownloadSimple weight="bold" className="w-4 h-4 text-gold-400 shrink-0" />
-                    <span>{language === "uz" ? "Yuklab olish" : "Download"}</span>
+                    <span className="sheen-overlay" aria-hidden="true" />
+                    <DownloadSimple weight="bold" className="w-4 h-4 text-gold-400 shrink-0 relative z-10" />
+                    <span className="relative z-10">{language === "uz" ? "Yuklab olish" : "Download"}</span>
                   </a>
                 </div>
               </div>

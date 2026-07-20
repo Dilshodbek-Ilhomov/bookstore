@@ -86,10 +86,10 @@ export function BookCard({ book }: BookCardProps) {
         />
 
         {/* Hover add-to-cart overlay */}
-        <div className="absolute inset-0 bg-navy-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+        <div className="absolute inset-0 bg-navy-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[3px]">
           <button
             onClick={handleAddToCart}
-            className="group/btn relative h-10 sm:h-12 w-10 sm:w-12 overflow-hidden rounded-full bg-gradient-to-tr from-gold-400 to-gold-500 text-navy-950 flex items-center justify-center shadow-[0_10px_24px_-6px_rgba(201,168,76,0.6)] hover:scale-110 active:scale-95 transition-transform duration-300"
+            className="group/btn relative h-10 sm:h-12 w-10 sm:w-12 overflow-hidden rounded-full bg-gradient-to-tr from-gold-400 to-gold-500 text-navy-950 flex items-center justify-center border border-white/25 backdrop-blur-md shadow-[0_10px_24px_-6px_rgba(201,168,76,0.6)] hover:scale-110 active:scale-95 transition-transform duration-300"
             aria-label={t.bookCard.add}
           >
             <span className="sheen-overlay" aria-hidden="true" />
@@ -160,14 +160,15 @@ export function BookCard({ book }: BookCardProps) {
               )}
             </div>
 
-            {/* Mobile Quick Add-to-Cart Button (Always accessible without hover on touchscreen) */}
+            {/* Mobile Quick Add-to-Cart Button (Always accessible without hover on touchscreen with Apple Liquid Glass) */}
             <button
               onClick={handleAddToCart}
-              className="sm:hidden h-7 w-7 rounded-xl bg-gold-400/15 hover:bg-gold-400 border border-gold-400/30 hover:border-gold-400 text-gold-400 hover:text-navy-950 flex items-center justify-center transition-all active:scale-90 shadow-sm shrink-0"
+              className="group/btn relative overflow-hidden sm:hidden h-7 w-7 rounded-xl bg-gold-400/20 backdrop-blur-md saturate-150 hover:bg-gold-400 border border-gold-400/40 hover:border-gold-400 text-gold-400 hover:text-navy-950 flex items-center justify-center transition-all active:scale-90 shadow-sm shrink-0"
               title={t.bookCard.add}
               aria-label={t.bookCard.add}
             >
-              <ShoppingCart weight="bold" className="w-3.5 h-3.5" />
+              <span className="sheen-overlay" aria-hidden="true" />
+              <ShoppingCart weight="bold" className="w-3.5 h-3.5 relative z-10" />
             </button>
           </div>
         </div>

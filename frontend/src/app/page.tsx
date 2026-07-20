@@ -236,9 +236,11 @@ export default function Home() {
           <div className="mt-12 text-center">
             <Link
               href="/books"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-navy-900/80 border border-white/10 hover:border-gold-400/40 text-sm font-semibold text-text-primary hover:text-gold-300 transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.2)]"
+              className="group relative inline-flex items-center gap-2 px-8 py-4 rounded-full bg-navy-900/80 backdrop-blur-md saturate-150 border border-white/15 hover:border-gold-400/40 text-sm font-semibold text-text-primary hover:text-gold-300 transition-all duration-300 hover:shadow-[0_0_25px_rgba(201,168,76,0.2)] overflow-hidden active:scale-[0.98]"
             >
-              {t.featured.allBooks} <ArrowRight weight="bold" className="w-4 h-4" />
+              <span className="sheen-overlay" aria-hidden="true" />
+              <span className="relative z-10">{t.featured.allBooks}</span>
+              <ArrowRight weight="bold" className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>

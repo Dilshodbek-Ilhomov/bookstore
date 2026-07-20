@@ -110,10 +110,10 @@ export function HeroSection({ books = [], loading = false }: HeroSectionProps = 
 
               <Link
                 href="#featured"
-                className="group relative inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-4 text-sm font-medium text-text-primary transition-all duration-300 hover:-translate-y-px hover:border-gold-400/35 hover:bg-white/[0.06] active:scale-[0.98]"
+                className="group relative inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] backdrop-blur-md saturate-150 px-6 py-4 text-sm font-medium text-text-primary transition-all duration-300 hover:-translate-y-px hover:border-gold-400/35 hover:bg-white/[0.08] active:scale-[0.98] shadow-sm"
               >
                 <span className="sheen-overlay" aria-hidden="true" />
-                <span>{t.hero.featuredCta}</span>
+                <span className="relative z-10">{t.hero.featuredCta}</span>
               </Link>
             </motion.div>
           </div>
