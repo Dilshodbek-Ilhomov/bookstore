@@ -101,7 +101,7 @@ export function HeroSection({ books = [], loading = false }: HeroSectionProps = 
             >
               <Link
                 href="/books"
-                className="group/btn relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-gold-400 to-gold-500 px-7 py-4 text-sm font-semibold text-navy-950 shadow-[0_14px_32px_-8px_rgba(201,168,76,0.45)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_20px_40px_-10px_rgba(201,168,76,0.65)] active:scale-[0.98]"
+                className="group/btn relative inline-flex items-center gap-2.5 overflow-hidden rounded-full bg-gradient-to-r from-gold-400/95 to-gold-500/95 backdrop-blur-md saturate-150 border border-white/30 px-8 py-4 text-sm font-semibold text-navy-950 shadow-[0_12px_28px_-6px_rgba(201,168,76,0.38),inset_0_1px_1.5px_rgba(255,255,255,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/50 hover:shadow-[0_18px_38px_-8px_rgba(201,168,76,0.58)] active:scale-[0.98]"
               >
                 <span className="sheen-overlay" aria-hidden="true" />
                 <span className="relative z-10">{t.hero.catalogCta}</span>
@@ -110,7 +110,7 @@ export function HeroSection({ books = [], loading = false }: HeroSectionProps = 
 
               <Link
                 href="#featured"
-                className="group relative inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] backdrop-blur-md saturate-150 px-6 py-4 text-sm font-medium text-text-primary transition-all duration-300 hover:-translate-y-px hover:border-gold-400/35 hover:bg-white/[0.08] active:scale-[0.98] shadow-sm"
+                className="group relative inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] backdrop-blur-md saturate-150 px-7 py-4 text-sm font-medium text-text-primary shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)] transition-all duration-300 hover:-translate-y-0.5 hover:border-gold-400/40 hover:bg-white/[0.1] hover:text-gold-300 active:scale-[0.98] overflow-hidden"
               >
                 <span className="sheen-overlay" aria-hidden="true" />
                 <span className="relative z-10">{t.hero.featuredCta}</span>

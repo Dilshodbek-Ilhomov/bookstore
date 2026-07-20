@@ -137,7 +137,7 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
               <button
                 type="button"
                 onClick={() => setViewMode((m) => (m === "canvas" ? "iframe" : "canvas"))}
-                className="group relative overflow-hidden hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/[0.06] backdrop-blur-md hover:bg-white/[0.12] border border-white/15 text-text-secondary hover:text-white text-xs font-semibold transition-all"
+                className="group relative overflow-hidden hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/[0.06] backdrop-blur-md hover:bg-white/[0.12] border border-white/15 text-text-secondary hover:text-white text-xs font-semibold transition-all"
                 title={language === "uz" ? "Ko'rish rejimini o'zgartirish" : "Switch view mode"}
               >
                 <span className="sheen-overlay" aria-hidden="true" />
@@ -158,7 +158,7 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
                 type="button"
                 onClick={handleInstantDownload}
                 disabled={downloading}
-                className="group/btn relative overflow-hidden inline-flex items-center gap-1.5 sm:gap-2 p-2 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-navy-950 border border-white/25 backdrop-blur-md text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-50"
+                className="group/btn relative overflow-hidden inline-flex items-center gap-1.5 sm:gap-2 p-2 sm:px-4 sm:py-2 rounded-full bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 text-navy-950 border border-white/25 backdrop-blur-md text-xs sm:text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-50"
                 title={language === "uz" ? "Faylni yuklab olish" : "Download file"}
               >
                 <span className="sheen-overlay" aria-hidden="true" />
@@ -181,7 +181,7 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
               <button
                 type="button"
                 onClick={handleOpenExternal}
-                className="group relative overflow-hidden inline-flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-xl bg-white/[0.06] backdrop-blur-md hover:bg-white/[0.12] border border-white/15 text-text-secondary hover:text-white text-xs font-semibold transition-all"
+                className="group relative overflow-hidden inline-flex items-center gap-1.5 p-2 sm:px-3.5 sm:py-2 rounded-full bg-white/[0.06] backdrop-blur-md hover:bg-white/[0.12] border border-white/15 text-text-secondary hover:text-white text-xs font-semibold transition-all"
                 title={language === "uz" ? "To'liq ekranda ochish" : "Open in new tab"}
               >
                 <span className="sheen-overlay" aria-hidden="true" />
@@ -194,7 +194,7 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/[0.06] backdrop-blur-md hover:bg-red-500/20 border border-white/15 hover:border-red-500/40 text-text-secondary hover:text-red-400 transition-all active:scale-95 ml-0.5"
+                className="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.06] backdrop-blur-md hover:bg-red-500/20 border border-white/15 hover:border-red-500/40 text-text-secondary hover:text-red-400 transition-all active:scale-95 ml-0.5"
                 aria-label="Close modal"
               >
                 <X weight="bold" className="w-4 h-4" />
@@ -352,7 +352,7 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
               <FilePdf weight="fill" className="w-7 h-7" />
             </div>
             <h4 className="text-base font-bold text-text-primary">
-              {language === "uz" ? "Online o'qishda kichik to'siq" : "Online reading notice"}
+            {language === "uz" ? "Online o'qishda kichik to'siq" : "Online reading notice"}
             </h4>
             <p className="text-xs text-text-secondary leading-relaxed">
               {language === "uz"
@@ -363,23 +363,33 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
               <button
                 type="button"
                 onClick={onFullscreen}
-                className="w-full py-3 px-5 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md"
+                className="group relative overflow-hidden w-full py-3 px-5 rounded-full bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
               >
-                <ArrowSquareOut weight="bold" className="w-4 h-4" />
-                <span>{language === "uz" ? "📑 To'liq ekranda o'qish" : "📑 Read in Fullscreen"}</span>
+                <span className="sheen-overlay" aria-hidden="true" />
+                <ArrowSquareOut weight="bold" className="w-4 h-4 relative z-10" />
+                <span className="relative z-10">{language === "uz" ? "📑 To'liq ekranda o'qish" : "📑 Read in Fullscreen"}</span>
               </button>
               <button
                 type="button"
                 onClick={onDownload}
                 disabled={downloading}
-                className="w-full py-3 px-5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-text-primary font-bold text-xs sm:text-sm flex items-center justify-center gap-2"
+                className="group relative overflow-hidden w-full py-3 px-5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/15 text-text-primary font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
               >
+                <span className="sheen-overlay" aria-hidden="true" />
                 {downloading ? (
-                  <Spinner className="w-4 h-4 animate-spin text-gold-400" />
+                  <Spinner className="w-4 h-4 animate-spin text-gold-400 relative z-10" />
                 ) : (
-                  <DownloadSimple weight="bold" className="w-4 h-4 text-gold-400" />
+                  <DownloadSimple weight="bold" className="w-4 h-4 text-gold-400 relative z-10" />
                 )}
-                <span>{language === "uz" ? "⚡ Yuklab olish (.pdf)" : "⚡ Download (.pdf)"}</span>
+                <span className="relative z-10">
+                  {downloading
+                    ? language === "uz"
+                      ? "..."
+                      : "..."
+                    : language === "uz"
+                      ? "📥 PDF yuklab olish"
+                      : "📥 Download PDF"}
+                </span>
               </button>
             </div>
           </div>

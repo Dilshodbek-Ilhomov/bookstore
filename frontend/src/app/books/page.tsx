@@ -197,7 +197,7 @@ function BooksContent() {
             <div className="flex flex-col gap-1">
               <button
                 onClick={() => updateFilters("category", null)}
-                className={`text-left px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                className={`text-left px-3.5 py-2 rounded-full text-xs font-medium transition-all ${
                   !activeCategory
                     ? "bg-gold-400/15 backdrop-blur-md border border-gold-400/30 text-gold-400 font-semibold shadow-sm"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/[0.05] hover:backdrop-blur-md border border-transparent hover:border-white/10"
@@ -209,7 +209,7 @@ function BooksContent() {
                 <button
                   key={cat.id}
                   onClick={() => updateFilters("category", String(cat.id))}
-                  className={`text-left px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-between ${
+                  className={`text-left px-3.5 py-2 rounded-full text-xs font-medium transition-all flex items-center justify-between ${
                     activeCategory === String(cat.id)
                       ? "bg-gold-400/15 backdrop-blur-md border border-gold-400/30 text-gold-400 font-semibold shadow-sm"
                       : "text-text-secondary hover:text-text-primary hover:bg-white/[0.05] hover:backdrop-blur-md border border-transparent hover:border-white/10"
@@ -233,7 +233,7 @@ function BooksContent() {
             <div className="flex flex-col gap-1">
               <button
                 onClick={() => updateFilters("ordering", null)}
-                className={`text-left px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                className={`text-left px-3.5 py-2 rounded-full text-xs font-medium transition-all ${
                   !activeOrdering
                     ? "bg-gold-400/15 backdrop-blur-md border border-gold-400/30 text-gold-400 font-semibold shadow-sm"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/[0.05] hover:backdrop-blur-md border border-transparent hover:border-white/10"
@@ -243,7 +243,7 @@ function BooksContent() {
               </button>
               <button
                 onClick={() => updateFilters("ordering", "price")}
-                className={`text-left px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                className={`text-left px-3.5 py-2 rounded-full text-xs font-medium transition-all ${
                   activeOrdering === "price"
                     ? "bg-gold-400/15 backdrop-blur-md border border-gold-400/30 text-gold-400 font-semibold shadow-sm"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/[0.05] hover:backdrop-blur-md border border-transparent hover:border-white/10"
@@ -253,7 +253,7 @@ function BooksContent() {
               </button>
               <button
                 onClick={() => updateFilters("ordering", "-price")}
-                className={`text-left px-3 py-2 rounded-xl text-xs font-medium transition-all ${
+                className={`text-left px-3.5 py-2 rounded-full text-xs font-medium transition-all ${
                   activeOrdering === "-price"
                     ? "bg-gold-400/15 backdrop-blur-md border border-gold-400/30 text-gold-400 font-semibold shadow-sm"
                     : "text-text-secondary hover:text-text-primary hover:bg-white/[0.05] hover:backdrop-blur-md border border-transparent hover:border-white/10"

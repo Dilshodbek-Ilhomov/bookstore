@@ -163,7 +163,7 @@ export function BookCard({ book }: BookCardProps) {
             {/* Mobile Quick Add-to-Cart Button (Always accessible without hover on touchscreen with Apple Liquid Glass) */}
             <button
               onClick={handleAddToCart}
-              className="group/btn relative overflow-hidden sm:hidden h-7 w-7 rounded-xl bg-gold-400/20 backdrop-blur-md saturate-150 hover:bg-gold-400 border border-gold-400/40 hover:border-gold-400 text-gold-400 hover:text-navy-950 flex items-center justify-center transition-all active:scale-90 shadow-sm shrink-0"
+              className="group/btn relative overflow-hidden sm:hidden h-7 w-7 rounded-full bg-gold-400/20 backdrop-blur-md saturate-150 hover:bg-gold-400 border border-gold-400/40 hover:border-gold-400 text-gold-400 hover:text-navy-950 flex items-center justify-center transition-all active:scale-90 shadow-sm shrink-0"
               title={t.bookCard.add}
               aria-label={t.bookCard.add}
             >
