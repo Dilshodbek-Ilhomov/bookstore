@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   X,
@@ -12,6 +12,9 @@ import {
   MagnifyingGlassMinus,
   Desktop,
   DeviceMobile,
+  CaretLeft,
+  CaretRight,
+  ArrowCounterClockwise,
 } from "@phosphor-icons/react";
 import { useLanguageStore } from "@/store/languageStore";
 
@@ -236,13 +239,14 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [scale, setScale] = useState<number>(1.2);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Mobil qurilmalarda Lenis va body scroll interception'ni o'chirish
+  // Mobil qurilmalarda Lenis va body scroll interception'ni o'chirish — passive touch
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    // Passive touch listeners — scroll'ni blokirovka qilmaydi
     const stop = (e: TouchEvent) => e.stopPropagation();
     container.addEventListener("touchstart", stop, { passive: true });
     container.addEventListener("touchmove", stop, { passive: true });
@@ -270,6 +274,8 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
         if (active) {
           setPdf(loadedPdf);
           setLoading(false);
+          setCurrentPage(1);
+          pageRefs.current = new Array(loadedPdf.numPages).fill(null);
         }
       } catch (err: any) {
         if (active) {
@@ -285,47 +291,96 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
     };
   }, [url]);
 
+  const scrollToPage = useCallback((pageNum: number) => {
+    if (!pdf || pageNum < 1 || pageNum > pdf.numPages) return;
+    const el = pageRefs.current[pageNum - 1];
+    if (el && scrollContainerRef.current) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setCurrentPage(pageNum);
+    }
+  }, [pdf]);
+
   return (
     <div className="flex-1 flex flex-col w-full h-full overflow-hidden min-h-0">
-      <div className="flex items-center justify-between px-3 sm:px-6 py-2 bg-navy-900/80 border-b border-white/5 shrink-0 z-10 text-xs text-text-secondary">
-        <div className="flex items-center gap-2 font-mono">
-          <span>{pdf ? `${pdf.numPages} ${language === "uz" ? "sahifa" : "pages"}` : "..."}</span>
-        </div>
-        <div className="flex items-center gap-2">
+      {/* Top Toolbar — Smooth Page Navigation & Zoom Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 sm:px-6 py-2.5 bg-navy-950/90 border-b border-white/10 shrink-0 z-20 text-xs text-text-secondary backdrop-blur-md">
+        {/* Page Selector Pill */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
-            onClick={() => setScale((s) => Math.max(0.6, s - 0.2))}
-            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-text-primary transition-colors"
-            title="Zoom out"
+            onClick={() => scrollToPage(currentPage - 1)}
+            disabled={!pdf || currentPage <= 1}
+            className="p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 disabled:opacity-30 text-text-primary transition-all active:scale-90"
+            title={language === "uz" ? "Oldingi sahifa" : "Previous page"}
           >
-            <MagnifyingGlassMinus weight="bold" className="w-4 h-4" />
+            <CaretLeft weight="bold" className="w-3.5 h-3.5" />
           </button>
-          <span className="font-mono text-gold-400 font-bold min-w-[48px] text-center">
-            {Math.round(scale * 100)}%
-          </span>
+          <div className="flex items-center gap-1 bg-white/[0.04] px-3 py-1 rounded-full border border-white/10 shadow-inner">
+            <input
+              type="number"
+              min={1}
+              max={pdf?.numPages || 1}
+              value={currentPage}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                if (!isNaN(val) && val >= 1 && val <= (pdf?.numPages || 1)) {
+                  scrollToPage(val);
+                }
+              }}
+              className="w-10 bg-transparent text-center font-mono font-bold text-gold-400 text-xs focus:outline-none"
+            />
+            <span className="text-text-muted font-mono text-xs select-none">/ {pdf?.numPages || "..."}</span>
+          </div>
           <button
             type="button"
-            onClick={() => setScale((s) => Math.min(2.4, s + 0.2))}
-            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-text-primary transition-colors"
-            title="Zoom in"
+            onClick={() => scrollToPage(currentPage + 1)}
+            disabled={!pdf || currentPage >= pdf.numPages}
+            className="p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 disabled:opacity-30 text-text-primary transition-all active:scale-90"
+            title={language === "uz" ? "Keyingi sahifa" : "Next page"}
           >
-            <MagnifyingGlassPlus weight="bold" className="w-4 h-4" />
+            <CaretRight weight="bold" className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Zoom Controls Pill */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <button
+            type="button"
+            onClick={() => setScale((s) => Math.max(0.6, Number((s - 0.2).toFixed(1))))}
+            className="p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 text-text-primary transition-all active:scale-90"
+            title={language === "uz" ? "Kichiklashtirish" : "Zoom out"}
+          >
+            <MagnifyingGlassMinus weight="bold" className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setScale(1.2)}
+            className="font-mono text-gold-400 font-bold text-xs px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 min-w-[56px] text-center transition-all active:scale-95"
+            title={language === "uz" ? "Asl o'lchamga qaytarish (Reset)" : "Reset zoom"}
+          >
+            {Math.round(scale * 100)}%
+          </button>
+          <button
+            type="button"
+            onClick={() => setScale((s) => Math.min(2.6, Number((s + 0.2).toFixed(1))))}
+            className="p-2 rounded-full bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 text-text-primary transition-all active:scale-90"
+            title={language === "uz" ? "Kattalashtirish" : "Zoom in"}
+          >
+            <MagnifyingGlassPlus weight="bold" className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
       {/*
-        ASOSIY FIX — Scroll container:
-        - overflow-y: scroll (auto emas — mobil uchun ishonchliroq)
-        - -webkit-overflow-scrolling: touch → iOS momentum scroll
-        - touch-action: pan-y pinch-zoom → vertikal scroll + pinch ruxsat
-        - overscroll-behavior: contain → body scroll'ga o'tib ketmaydi
-        - data-lenis-prevent → Lenis bu containerda scroll intercept qilmasin
-        - min-h-0 → flex parent'dan to'g'ri o'lcham
+        ASOSIY FIX — Hardware Accelerated Scroll Container:
+        - overflow-y: scroll & overscroll-behavior: contain (mobil uchun ideal)
+        - WebkitOverflowScrolling: touch → iOS Apple momentum scroll
+        - transform: translateZ(0) & will-change → GPU tezlanish
+        - touch-action: pan-y pinch-zoom → bemalol vertikal scroll + pinch
       */}
       <div
         ref={scrollContainerRef}
-        className="flex-1 w-full p-3 sm:p-6 space-y-6"
+        className="flex-1 w-full p-3 sm:p-6 space-y-6 gpu-layer"
         style={{
           overflowY: "scroll",
           overflowX: "auto",
@@ -334,25 +389,26 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
           overscrollBehavior: "contain",
           minHeight: 0,
           position: "relative",
+          willChange: "scroll-position",
         }}
         data-lenis-prevent
       >
         {loading && (
           <div className="w-full h-80 flex flex-col items-center justify-center text-center gap-3">
             <Spinner className="w-10 h-10 animate-spin text-gold-400" />
-            <p className="text-sm font-semibold text-text-secondary">
+            <p className="text-sm font-semibold text-text-secondary font-mono">
               {language === "uz" ? "PDF sahifalari tayyorlanmoqda..." : "Rendering PDF pages..."}
             </p>
           </div>
         )}
 
         {error && (
-          <div className="w-full max-w-md mx-auto my-12 p-6 rounded-2xl bg-navy-900/90 border border-white/10 text-center space-y-4 shadow-xl">
-            <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-400">
+          <div className="w-full max-w-md mx-auto my-12 p-6 rounded-3xl bg-navy-900/90 border border-white/10 text-center space-y-4 shadow-xl">
+            <div className="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-400">
               <FilePdf weight="fill" className="w-7 h-7" />
             </div>
             <h4 className="text-base font-bold text-text-primary">
-            {language === "uz" ? "Online o'qishda kichik to'siq" : "Online reading notice"}
+              {language === "uz" ? "Online o'qishda kichik to'siq" : "Online reading notice"}
             </h4>
             <p className="text-xs text-text-secondary leading-relaxed">
               {language === "uz"
@@ -363,7 +419,7 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
               <button
                 type="button"
                 onClick={onFullscreen}
-                className="group relative overflow-hidden w-full py-3 px-5 rounded-full bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+                className="group relative overflow-hidden w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
               >
                 <span className="sheen-overlay" aria-hidden="true" />
                 <ArrowSquareOut weight="bold" className="w-4 h-4 relative z-10" />
@@ -373,7 +429,7 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
                 type="button"
                 onClick={onDownload}
                 disabled={downloading}
-                className="group relative overflow-hidden w-full py-3 px-5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/15 text-text-primary font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
+                className="group relative overflow-hidden w-full py-3.5 px-5 rounded-full bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/15 text-text-primary font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95"
               >
                 <span className="sheen-overlay" aria-hidden="true" />
                 {downloading ? (
@@ -384,11 +440,11 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
                 <span className="relative z-10">
                   {downloading
                     ? language === "uz"
-                      ? "..."
-                      : "..."
+                    ? "..."
+                    : "..."
                     : language === "uz"
-                      ? "📥 PDF yuklab olish"
-                      : "📥 Download PDF"}
+                    ? "📥 PDF yuklab olish"
+                    : "📥 Download PDF"}
                 </span>
               </button>
             </div>
@@ -396,9 +452,22 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
         )}
 
         {!loading && !error && pdf && (
-          <div className="flex flex-col items-center gap-6 pb-12">
+          <div className="flex flex-col items-center gap-6 pb-16">
             {Array.from({ length: pdf.numPages }).map((_, i) => (
-              <PDFPageCanvas key={i + 1} pdf={pdf} pageNumber={i + 1} scale={scale} language={language} />
+              <div
+                key={i + 1}
+                ref={(el) => { pageRefs.current[i] = el; }}
+                data-page-number={i + 1}
+                className="w-full flex justify-center"
+              >
+                <PDFPageCanvas
+                  pdf={pdf}
+                  pageNumber={i + 1}
+                  scale={scale}
+                  language={language}
+                  onVisible={() => setCurrentPage(i + 1)}
+                />
+              </div>
             ))}
           </div>
         )}
@@ -407,37 +476,68 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
   );
 }
 
-function PDFPageCanvas({
-  pdf,
-  pageNumber,
-  scale,
-  language,
-}: {
+interface PDFPageCanvasProps {
   pdf: any;
   pageNumber: number;
   scale: number;
   language: string;
-}) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [pageRendering, setPageRendering] = useState(true);
+  onVisible?: () => void;
+}
 
+function PDFPageCanvas({ pdf, pageNumber, scale, language, onVisible }: PDFPageCanvasProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isInView, setIsInView] = useState(false);
+  const [pageRendering, setPageRendering] = useState(false);
+  const [pageDimensions, setPageDimensions] = useState<{ width: number; height: number } | null>(null);
+
+  // IntersectionObserver — faqat ekranga yaqinlashganda yuklash (+800px margin)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            if (onVisible) onVisible();
+          }
+        });
+      },
+      { rootMargin: "800px 0px 800px 0px", threshold: 0.02 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [onVisible]);
+
+  // Sahifani faqat isInView bo'lsa va scale/pdf o'zgarganda chizish
   useEffect(() => {
     let renderTask: any = null;
     let active = true;
 
     const renderPage = async () => {
-      if (!pdf || !canvasRef.current) return;
+      if (!pdf || !isInView || !canvasRef.current) return;
       try {
         setPageRendering(true);
         const page = await pdf.getPage(pageNumber);
         const viewport = page.getViewport({ scale });
+        if (!active) return;
+
+        setPageDimensions({ width: viewport.width, height: viewport.height });
+
         const canvas = canvasRef.current;
-        if (!canvas || !active) return;
-        const context = canvas.getContext("2d");
+        const context = canvas.getContext("2d", { alpha: false });
         if (!context) return;
 
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+        // Apple Retina (High DPI) va o'ta tiniq o'qish uchun dpr hisoblash
+        const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+        canvas.width = Math.floor(viewport.width * dpr);
+        canvas.height = Math.floor(viewport.height * dpr);
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+
+        context.save();
+        context.scale(dpr, dpr);
 
         renderTask = page.render({
           canvasContext: context,
@@ -445,10 +545,12 @@ function PDFPageCanvas({
         });
 
         await renderTask.promise;
+        context.restore();
         if (active) setPageRendering(false);
       } catch (err: any) {
         if (err?.name !== "RenderingCancelledException") {
           console.error(`Page ${pageNumber} render error:`, err);
+          if (active) setPageRendering(false);
         }
       }
     };
@@ -460,25 +562,57 @@ function PDFPageCanvas({
         renderTask.cancel();
       }
     };
-  }, [pdf, pageNumber, scale]);
+  }, [pdf, pageNumber, scale, isInView]);
 
   return (
     <div
-      className="relative flex flex-col items-center bg-navy-900/90 border border-white/10 rounded-2xl p-2 sm:p-4 shadow-2xl max-w-full"
-      style={{ overflowX: "auto", touchAction: "pan-x pan-y pinch-zoom" }}
+      ref={containerRef}
+      className="relative flex flex-col items-center bg-navy-900/90 border border-white/10 rounded-3xl p-2.5 sm:p-4 shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7)] transition-all duration-300 hover:border-white/20 max-w-full group/page gpu-layer"
+      style={{
+        minHeight: pageDimensions ? `${pageDimensions.height + 40}px` : "620px",
+        width: pageDimensions ? `${Math.min(pageDimensions.width + 32, 1100)}px` : "100%",
+        touchAction: "pan-x pan-y pinch-zoom",
+        willChange: "transform",
+      }}
     >
-      <div className="text-[11px] font-mono font-bold text-gold-400 mb-2 px-3 py-0.5 rounded-full bg-navy-950/80 border border-white/5">
-        {language === "uz" ? `Sahifa ${pageNumber} / ${pdf.numPages}` : `Page ${pageNumber} / ${pdf.numPages}`}
+      <div className="flex items-center justify-between w-full mb-2.5 px-2">
+        <span className="text-[11px] font-mono font-bold text-gold-400 px-3 py-1 rounded-full bg-navy-950/80 border border-white/10 shadow-sm">
+          {language === "uz" ? `${pageNumber}-sahifa` : `Page ${pageNumber}`}
+        </span>
+        {pageDimensions && (
+          <span className="text-[10px] font-mono text-text-muted opacity-0 group-hover/page:opacity-100 transition-opacity">
+            {Math.round(pageDimensions.width)} × {Math.round(pageDimensions.height)}px
+          </span>
+        )}
       </div>
-      {pageRendering && (
-        <div className="absolute inset-0 flex items-center justify-center bg-navy-950/60 rounded-xl z-10 backdrop-blur-xs min-h-[300px]">
-          <Spinner className="w-8 h-8 animate-spin text-gold-400" />
+
+      {!isInView && (
+        <div className="w-full aspect-[1/1.4] max-w-2xl rounded-2xl bg-navy-950/50 border border-white/5 animate-pulse flex flex-col items-center justify-center gap-3 my-auto">
+          <Spinner className="w-6 h-6 animate-spin text-gold-400/40" />
+          <span className="text-xs font-mono text-text-muted">
+            {language === "uz" ? `${pageNumber}-sahifa yuklanmoqda...` : `Loading page ${pageNumber}...`}
+          </span>
         </div>
       )}
+
+      {isInView && pageRendering && (
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center bg-navy-950/70 rounded-3xl z-10 backdrop-blur-xs gap-2.5 transition-opacity"
+          style={{ minHeight: "300px" }}
+        >
+          <Spinner className="w-8 h-8 animate-spin text-gold-400" />
+          <span className="text-xs font-mono font-semibold text-text-secondary">
+            {language === "uz" ? "Sahifa silliqlanmoqda..." : "Rendering smooth page..."}
+          </span>
+        </div>
+      )}
+
       <canvas
         ref={canvasRef}
-        className="max-w-full h-auto rounded-lg shadow-md bg-white select-none"
-        style={{ display: "block" }}
+        className={`max-w-full h-auto rounded-2xl shadow-xl bg-white select-none transition-opacity duration-300 ${
+          !isInView || pageRendering ? "opacity-40" : "opacity-100"
+        }`}
+        style={{ display: isInView ? "block" : "none" }}
       />
     </div>
   );
