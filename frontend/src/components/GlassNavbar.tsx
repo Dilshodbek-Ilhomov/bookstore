@@ -50,7 +50,7 @@ export function GlassNavbar() {
           <Link
             href="/"
             aria-label="BookStore Home"
-            className="group pointer-events-auto relative inline-flex shrink-0 items-center gap-2.5 overflow-hidden rounded-2xl border border-white/[0.12] bg-navy-950/[0.45] px-3 py-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-white/[0.2] hover:bg-navy-950/[0.6] hover:shadow-[0_12px_36px_-6px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.22)] active:scale-[0.98]"
+            className="group pointer-events-auto relative inline-flex shrink-0 items-center gap-2.5 overflow-hidden rounded-full border border-white/[0.12] bg-navy-950/[0.45] px-4 py-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-white/[0.2] hover:bg-navy-950/[0.6] hover:shadow-[0_12px_36px_-6px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.22)] active:scale-[0.98]"
           >
             <span className="sheen-overlay" aria-hidden="true" />
             <BookStoreLogo className="w-7 h-7 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-3 shrink-0" />
@@ -161,11 +161,11 @@ export function GlassNavbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.96 }}
               transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-auto mt-3 mx-auto max-w-7xl rounded-2xl border border-white/[0.12] bg-navy-950/[0.65] p-3 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-2xl md:hidden"
+              className="pointer-events-auto mt-3 mx-auto max-w-7xl rounded-3xl border border-white/[0.12] bg-navy-950/[0.65] p-3.5 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7),inset_0_1px_0_0_rgba(255,255,255,0.18)] backdrop-blur-2xl md:hidden"
             >
               <div className="flex flex-col gap-1">
                 {/* Mobile Language Selector */}
-                <div className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 px-4 py-2.5 mb-2">
+                <div className="flex items-center justify-between rounded-2xl bg-white/[0.03] border border-white/5 px-4 py-2.5 mb-2">
                   <span className="text-xs font-medium text-text-muted uppercase tracking-wider flex items-center gap-1.5">
                     <Globe weight="bold" className="w-4 h-4 text-gold-400" />
                     {t.common.selectLanguage}
@@ -201,7 +201,7 @@ export function GlassNavbar() {
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsMobileOpen(false)}
-                    className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-text-secondary transition-all hover:bg-white/[0.04] hover:text-text-primary"
+                    className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium text-text-secondary transition-all hover:bg-white/[0.04] hover:text-text-primary"
                   >
                     <span>{link.label}</span>
                     <ArrowRight weight="bold" className="w-3.5 h-3.5 text-gold-400" />
@@ -211,7 +211,7 @@ export function GlassNavbar() {
                   <Link
                     href="/profile"
                     onClick={() => setIsMobileOpen(false)}
-                    className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-white/[0.08] py-3 text-sm font-semibold text-gold-400 border border-gold-400/20 shadow-lg"
+                    className="mt-2 flex items-center justify-center gap-2 rounded-full bg-white/[0.08] py-3.5 text-sm font-semibold text-gold-400 border border-gold-400/20 shadow-lg"
                   >
                     <User weight="bold" className="w-4 h-4" />
                     <span>{t.nav.profile}</span>
@@ -220,7 +220,7 @@ export function GlassNavbar() {
                   <Link
                     href="/login"
                     onClick={() => setIsMobileOpen(false)}
-                    className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gold-400 to-gold-500 py-3 text-sm font-semibold text-navy-950 shadow-lg"
+                    className="mt-2 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold-400 to-gold-500 py-3.5 text-sm font-semibold text-navy-950 shadow-lg"
                   >
                     <span>{t.nav.login}</span>
                     <ArrowRight weight="bold" className="w-4 h-4" />

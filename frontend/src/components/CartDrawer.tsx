@@ -219,10 +219,10 @@ export function CartDrawer() {
 
                 <button
                   onClick={handleCheckout}
-                  className="w-full relative group overflow-hidden rounded-2xl bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 p-[1px] shadow-[0_0_25px_rgba(201,168,76,0.4)] transition-all duration-300 hover:shadow-[0_0_35px_rgba(201,168,76,0.6)] hover:scale-[1.01] active:scale-[0.98]"
+                  className="w-full relative group overflow-hidden rounded-full bg-gradient-to-r from-gold-400 via-gold-300 to-gold-500 p-[1px] shadow-[0_0_25px_rgba(201,168,76,0.4)] transition-all duration-300 hover:shadow-[0_0_35px_rgba(201,168,76,0.6)] hover:scale-[1.01] active:scale-[0.98]"
                 >
                   <span className="sheen-overlay" aria-hidden="true" />
-                  <div className="h-13 sm:h-14 w-full bg-navy-950/25 backdrop-blur-md group-hover:bg-transparent transition-colors rounded-2xl flex items-center justify-center gap-2.5 font-bold tracking-wide text-navy-950 text-sm sm:text-base uppercase">
+                  <div className="h-13 sm:h-14 w-full bg-navy-950/25 backdrop-blur-md group-hover:bg-transparent transition-colors rounded-full flex items-center justify-center gap-2.5 font-bold tracking-wide text-navy-950 text-sm sm:text-base uppercase">
                     <span className="relative z-10">{t.cart.checkout}</span>
                     <ArrowRight weight="bold" className="w-5 h-5 transition-transform group-hover:translate-x-1 relative z-10" />
                   </div>

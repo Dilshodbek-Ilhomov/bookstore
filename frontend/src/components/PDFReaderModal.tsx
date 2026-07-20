@@ -110,7 +110,7 @@ export function PDFReaderModal({ isOpen, onClose, title, pdfUrl }: PDFReaderModa
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 flex flex-col w-full max-w-6xl rounded-2xl sm:rounded-3xl border border-white/15 bg-navy-900 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)] overflow-hidden"
+          className="relative z-10 flex flex-col w-full max-w-6xl rounded-3xl sm:rounded-[36px] border border-white/15 bg-navy-900 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)] overflow-hidden"
           style={{ height: "94svh", maxHeight: "94svh", touchAction: "auto" }}
         >
           <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 bg-navy-950/90 border-b border-white/10 shrink-0 gap-2">
@@ -295,7 +295,7 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
           <button
             type="button"
             onClick={() => setScale((s) => Math.max(0.6, s - 0.2))}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-text-primary transition-colors"
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-text-primary transition-colors"
             title="Zoom out"
           >
             <MagnifyingGlassMinus weight="bold" className="w-4 h-4" />
@@ -306,7 +306,7 @@ function PDFCanvasViewer({ url, title, onFullscreen, onDownload, downloading, la
           <button
             type="button"
             onClick={() => setScale((s) => Math.min(2.4, s + 0.2))}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-text-primary transition-colors"
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-text-primary transition-colors"
             title="Zoom in"
           >
             <MagnifyingGlassPlus weight="bold" className="w-4 h-4" />

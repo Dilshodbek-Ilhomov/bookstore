@@ -67,13 +67,13 @@ export function BookCard({ book }: BookCardProps) {
         willChange: "transform, opacity",
       }}
       transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative flex flex-col justify-between h-full rounded-2xl sm:rounded-3xl border border-white/10 bg-navy-900/75 p-2.5 sm:p-4 transition-[transform,border-color,background-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-gold-400/40 hover:bg-navy-900 hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.12)] hover:-translate-y-1 sm:hover:-translate-y-1.5 overflow-hidden gpu-layer content-visibility-auto"
+      className="group relative flex flex-col justify-between h-full rounded-3xl sm:rounded-[32px] border border-white/10 bg-navy-900/75 p-2.5 sm:p-4 transition-[transform,border-color,background-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-gold-400/40 hover:bg-navy-900 hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.12)] hover:-translate-y-1 sm:hover:-translate-y-1.5 overflow-hidden gpu-layer content-visibility-auto"
     >
       {/* Micro-Sheen Reflection */}
       <span className="sheen-overlay" aria-hidden="true" />
 
       {/* Cover image */}
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl sm:rounded-2xl bg-navy-950 mb-2.5 sm:mb-4 ring-1 ring-white/5 transition-all duration-500 group-hover:ring-gold-400/20">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-navy-950 mb-2.5 sm:mb-4 ring-1 ring-white/5 transition-all duration-500 group-hover:ring-gold-400/20">
         <Image
           src={getImageUrl(book.cover_image)}
           alt={getLocalizedBookTitle(book, language, t)}
