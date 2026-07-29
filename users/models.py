@@ -30,6 +30,10 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
+    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    bio = models.TextField(null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

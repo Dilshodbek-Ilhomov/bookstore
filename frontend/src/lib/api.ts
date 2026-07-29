@@ -127,6 +127,13 @@ export const authAPI = {
     return apiFetch<User>("/auth/me/");
   },
 
+  updateProfile: async (data: FormData | Partial<User>): Promise<User> => {
+    return apiFetch<User>("/auth/me/", {
+      method: "PATCH",
+      body: data instanceof FormData ? data : JSON.stringify(data),
+    });
+  },
+
   logout: () => {
     clearTokens();
   },

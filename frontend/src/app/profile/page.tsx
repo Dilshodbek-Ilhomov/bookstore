@@ -3,10 +3,14 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { ordersAPI } from "@/lib/api";
-import type { Order } from "@/types";
+import { ordersAPI, authAPI } from "@/lib/api";
+import type { Order, User as UserType } from "@/types";
 import { formatDate, formatPrice, getImageUrl } from "@/lib/utils";
-import { User, SignOut, Receipt, BookOpen, BellRinging, CheckCircle, XCircle, Clock, ArrowsClockwise, FilePdf, DownloadSimple } from "@phosphor-icons/react";
+import { 
+  User, SignOut, Receipt, BookOpen, BellRinging, CheckCircle, XCircle, Clock, 
+  ArrowsClockwise, FilePdf, DownloadSimple, Camera, PencilSimple, Phone, MapPin, 
+  FloppyDisk, UserCircle 
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import { useLanguageStore } from "@/store/languageStore";
 import { getLocalizedBookTitle } from "@/lib/i18n";
@@ -14,7 +18,7 @@ import { PDFReaderModal } from "@/components/PDFReaderModal";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, logout, isAuthenticated, hydrate } = useAuthStore();
+  const { user, setUser, logout, isAuthenticated, hydrate } = useAuthStore();
   const { language, t } = useLanguageStore();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,9 +28,72 @@ export default function ProfilePage() {
   const [activePdf, setActivePdf] = useState<{ title: string; url: string } | null>(null);
   const prevOrdersRef = useRef<Order[]>([]);
 
+  // Profile Edit State
+  const [isEditing, setIsEditing] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileSuccess, setProfileSuccess] = useState(false);
+  const [profileError, setProfileError] = useState("");
+
+  const [firstName, setFirstName] = useState(user?.first_name || "");
+  const [lastName, setLastName] = useState(user?.last_name || "");
+  const [phoneNumber, setPhoneNumber] = useState(user?.phone_number || "");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [address, setAddress] = useState(user?.address || "");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatar || null);
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.first_name || "");
+      setLastName(user.last_name || "");
+      setPhoneNumber(user.phone_number || "");
+      setBio(user.bio || "");
+      setAddress(user.address || "");
+      setAvatarPreview(user.avatar || null);
+    }
+  }, [user]);
+
   useEffect(() => {
     hydrate();
   }, [hydrate]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    setProfileError("");
+    setProfileSuccess(false);
+
+    try {
+      const formData = new FormData();
+      formData.append("first_name", firstName);
+      formData.append("last_name", lastName);
+      formData.append("phone_number", phoneNumber);
+      formData.append("bio", bio);
+      formData.append("address", address);
+
+      if (avatarFile) {
+        formData.append("avatar", avatarFile);
+      }
+
+      const updatedUser = await authAPI.updateProfile(formData);
+      setUser(updatedUser);
+      setProfileSuccess(true);
+      setIsEditing(false);
+      setTimeout(() => setProfileSuccess(false), 4000);
+    } catch (err: any) {
+      setProfileError(err?.message || "Xatolik yuz berdi");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   const loadOrders = useCallback(async (isSilent = false) => {
     if (!isAuthenticated) return;
@@ -105,27 +172,80 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* User Card */}
         <div className="glass p-6 rounded-2xl border border-white/5 space-y-6 h-fit">
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="w-16 h-16 rounded-full bg-gold-400/10 flex items-center justify-center border border-gold-400/20 text-gold-400">
-              <User weight="bold" className="w-8 h-8" />
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="relative group">
+              <div className="w-20 h-20 rounded-full bg-gold-400/10 flex items-center justify-center border-2 border-gold-400/30 text-gold-400 overflow-hidden shadow-lg">
+                {avatarPreview ? (
+                  <img 
+                    src={getImageUrl(avatarPreview)} 
+                    alt="Avatar" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User weight="bold" className="w-10 h-10" />
+                )}
+              </div>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-gold-400 text-navy-950 hover:bg-gold-300 transition-transform hover:scale-110 shadow-md"
+                title="Profilni tahrirlash"
+              >
+                <Camera weight="bold" className="w-3.5 h-3.5" />
+              </button>
             </div>
+
             <div>
-              <h2 className="text-base font-bold text-text-primary">
-                {user.first_name} {user.last_name}
+              <h2 className="text-lg font-bold text-text-primary">
+                {user.first_name || user.last_name ? `${user.first_name} ${user.last_name}` : "Foydalanuvchi"}
               </h2>
-              <p className="text-xs text-text-secondary">{user.email}</p>
+              <p className="text-xs text-text-secondary font-mono">{user.email}</p>
+            </div>
+
+            {user.bio && (
+              <p className="text-xs text-text-muted italic px-2">"{user.bio}"</p>
+            )}
+
+            <div className="w-full space-y-2 text-left pt-2 text-xs text-text-secondary">
+              {user.phone_number && (
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-gold-400 shrink-0" />
+                  <span>{user.phone_number}</span>
+                </div>
+              )}
+              {user.address && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-gold-400 shrink-0" />
+                  <span>{user.address}</span>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="divider-gold opacity-20" />
 
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-red-500/20 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
-          >
-            <SignOut weight="bold" className="w-4 h-4" />
-            {t.profilePage.logout}
-          </button>
+          {profileSuccess && (
+            <div className="p-3 rounded-xl bg-green-500/15 border border-green-500/30 text-xs text-green-400 text-center animate-fade-in">
+              Profil muvaffaqiyatli saqlandi!
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gold-400/15 border border-gold-400/30 text-xs font-semibold text-gold-400 hover:bg-gold-400/25 transition-all"
+            >
+              <PencilSimple weight="bold" className="w-4 h-4" />
+              Profilni tahrirlash
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-red-500/20 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
+            >
+              <SignOut weight="bold" className="w-4 h-4" />
+              {t.profilePage.logout}
+            </button>
+          </div>
         </div>
 
         {/* Orders list */}
@@ -306,6 +426,127 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass border border-white/10 rounded-2xl w-full max-w-lg p-6 space-y-6 animate-scale-up max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
+                <PencilSimple className="w-5 h-5 text-gold-400" />
+                Profilni tahrirlash
+              </h3>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="text-text-muted hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {profileError && (
+              <div className="p-3 rounded-xl bg-red-500/15 border border-red-500/30 text-xs text-red-400">
+                {profileError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              {/* Avatar Upload */}
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-gold-400/10 flex items-center justify-center border border-gold-400/30 overflow-hidden shrink-0">
+                  {avatarPreview ? (
+                    <img src={getImageUrl(avatarPreview)} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <UserCircle className="w-10 h-10 text-gold-400" />
+                  )}
+                </div>
+                <div>
+                  <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gold-400/15 border border-gold-400/30 text-xs text-gold-400 hover:bg-gold-400/25 cursor-pointer font-semibold transition-all">
+                    <Camera className="w-4 h-4" />
+                    <span>Rasm tanlash</span>
+                    <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                  </label>
+                  <p className="text-[11px] text-text-muted mt-1">Max 2MB (JPG, PNG, WEBP)</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-text-secondary mb-1">Ism</label>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-navy-900 border border-white/10 text-sm text-text-primary focus:border-gold-400 outline-none"
+                    placeholder="Ismingiz"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-text-secondary mb-1">Familiya</label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-navy-900 border border-white/10 text-sm text-text-primary focus:border-gold-400 outline-none"
+                    placeholder="Familiyangiz"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-text-secondary mb-1">Telefon raqami</label>
+                <input
+                  type="text"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-navy-900 border border-white/10 text-sm text-text-primary focus:border-gold-400 outline-none"
+                  placeholder="+998 90 123 45 67"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-text-secondary mb-1">Men haqimda (Bio)</label>
+                <textarea
+                  rows={2}
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-navy-900 border border-white/10 text-sm text-text-primary focus:border-gold-400 outline-none resize-none"
+                  placeholder="O'zingiz haqingizda qisqacha..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-text-secondary mb-1">Manzil</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-navy-900 border border-white/10 text-sm text-text-primary focus:border-gold-400 outline-none"
+                  placeholder="Toshkent sh., Chilonzor tumani..."
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="px-4 py-2 rounded-xl border border-white/10 text-xs text-text-secondary hover:bg-white/5"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gold-400 text-navy-950 font-bold text-xs hover:bg-gold-300 disabled:opacity-50 transition-all shadow-md"
+                >
+                  <FloppyDisk weight="bold" className="w-4 h-4" />
+                  {savingProfile ? "Saqlanmoqda..." : "Saqlash"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {activePdf && (
         <PDFReaderModal

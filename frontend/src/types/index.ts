@@ -81,6 +81,10 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
+  avatar?: string | null;
+  phone_number?: string | null;
+  bio?: string | null;
+  address?: string | null;
 }
 
 export interface AuthTokens {
