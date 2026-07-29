@@ -56,7 +56,12 @@ export const useAuthStore = create<AuthState>((set) => ({
             set({ user: freshUser, isAuthenticated: true });
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          set({ user: null, isAuthenticated: false });
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("user");
+          }
+        });
     } else if (token) {
       authAPI.me()
         .then((freshUser) => {
@@ -65,7 +70,12 @@ export const useAuthStore = create<AuthState>((set) => ({
             set({ user: freshUser, isAuthenticated: true });
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          set({ user: null, isAuthenticated: false });
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("user");
+          }
+        });
     }
   },
 }));

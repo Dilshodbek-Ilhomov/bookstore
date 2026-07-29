@@ -547,12 +547,23 @@ export default function BookDetailPage({ params }: PageProps) {
                       className="glass p-6 rounded-2xl border border-white/5 space-y-3 transition-all duration-300 hover:border-white/15"
                     >
                       <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-full bg-gold-400/10 border border-gold-400/20 flex items-center justify-center text-gold-400 font-bold text-sm shrink-0">
-                            {reviewerName[0]?.toUpperCase() || "K"}
-                          </div>
+                        <Link href={`/profile/${review.user_detail?.id || review.user}`} className="flex items-center gap-3 min-w-0 group/reviewer">
+                          {review.user_detail?.avatar ? (
+                            <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gold-400/20 group-hover/reviewer:border-gold-400/50 transition-colors">
+                              <Image 
+                                src={getImageUrl(review.user_detail.avatar)} 
+                                alt={reviewerName} 
+                                fill 
+                                className="object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gold-400/10 border border-gold-400/20 flex items-center justify-center text-gold-400 font-bold text-sm shrink-0 group-hover/reviewer:bg-gold-400/20 transition-colors">
+                              {reviewerName[0]?.toUpperCase() || "K"}
+                            </div>
+                          )}
                           <div className="min-w-0">
-                            <h4 className="text-sm font-bold text-text-primary truncate">
+                            <h4 className="text-sm font-bold text-text-primary truncate group-hover/reviewer:text-gold-400 transition-colors">
                               {reviewerName}
                             </h4>
                             <span className="text-[11px] text-text-muted font-mono">
@@ -563,7 +574,7 @@ export default function BookDetailPage({ params }: PageProps) {
                                 : ""}
                             </span>
                           </div>
-                        </div>
+                        </Link>
 
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="flex items-center gap-1 bg-gold-400/10 px-2.5 py-1 rounded-full border border-gold-400/20">

@@ -18,7 +18,9 @@ class ReviewSerializer(serializers.ModelSerializer):
             "first_name": getattr(obj.user, "first_name", ""),
             "last_name": getattr(obj.user, "last_name", ""),
             "email": getattr(obj.user, "email", ""),
+            "avatar": obj.user.avatar.url if obj.user.avatar else None,
         }
+
 
 class ReviewCreateSerializer(serializers.Serializer):
     book = serializers.IntegerField()

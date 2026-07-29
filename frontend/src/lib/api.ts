@@ -58,18 +58,23 @@ async function apiFetch<T>(
   let response = await fetch(url, { ...options, headers });
 
   // If 401, try refreshing token
-  if (response.status === 401 && getRefreshToken()) {
-    const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh: getRefreshToken() }),
-    });
+  if (response.status === 401) {
+    if (getRefreshToken()) {
+      const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh: getRefreshToken() }),
+      });
 
-    if (refreshResponse.ok) {
-      const data = await refreshResponse.json();
-      localStorage.setItem("access_token", data.access);
-      headers["Authorization"] = `Bearer ${data.access}`;
-      response = await fetch(url, { ...options, headers });
+      if (refreshResponse.ok) {
+        const data = await refreshResponse.json();
+        localStorage.setItem("access_token", data.access);
+        headers["Authorization"] = `Bearer ${data.access}`;
+        response = await fetch(url, { ...options, headers });
+      } else {
+        clearTokens();
+        throw new Error("Session expired");
+      }
     } else {
       clearTokens();
       throw new Error("Session expired");
@@ -137,6 +142,11 @@ export const authAPI = {
   logout: () => {
     clearTokens();
   },
+};
+
+// ---- Users API ----
+export const usersAPI = {
+  getProfile: (id: number): Promise<User> => apiFetch(`/auth/profile/${id}/`),
 };
 
 // ---- Books API ----
