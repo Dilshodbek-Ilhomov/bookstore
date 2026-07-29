@@ -49,6 +49,7 @@ export interface Review {
     email: string;
     first_name: string;
     last_name: string;
+    avatar?: string | null;
   };
 }
 
@@ -58,6 +59,7 @@ export interface ReviewWithUser extends Omit<Review, "user"> {
     email: string;
     first_name: string;
     last_name: string;
+    avatar?: string | null;
   };
 }
 
